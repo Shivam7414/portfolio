@@ -1,0 +1,75 @@
+Contact
+ Jodhpur, Rajasthan
+ 7414887589 (Mobile)
+ ojhashivam7414@gmail.com
+ www.linkedin.com/in/shivam
+kumar-ojha (LinkedIn)
+ Top Skills
+ Redis
+ WebSocket
+ Queues
+ Shivam Kumar
+ Software Developer | Architecting Scalable SaaS, Delivery & ERP
+ Systems | Laravel, JavaScript, AI & Cloud Solutions
+ Jodhpur, Rajasthan, India
+ Summary
+ I’m a Software Developer who builds end-to-end platforms - from
+ concept to deployment - focusing on scalability, performance, and
+ real-world impact.
+ Over the past 2+ years, I’ve engineered complex SaaS platforms,
+ delivery systems, and enterprise resource management tools,
+ solving challenges like multi-role access control, live tracking,
+ payment automation, and intelligent reporting.
+ Tech Stack & Expertise:
+ 1. Backend: Laravel, Node.js, REST APIs, Redis, MySQL
+ 2. Frontend: JavaScript, Vue.js, React (basic)
+ 3. Cloud & DevOps: AWS, Linux servers, CI/CD pipelines
+ 4. Integrations: Google Maps, Stripe, Razorpay, OpenAI APIs
+ I care about system design, scalable architecture, and writing
+ code that can grow with business needs. My goal is to build digital
+ systems that automate, simplify, and scale operations efficiently.
+ Experience
+ Maxaix
+ Full-stack Developer
+ March 2024 - Present (1 year 10 months)
+ Jodhpur, Rajasthan, India
+ 1. "Leading backend development and architecture for multiple large-scale
+ platforms, including hotel, flight, and bus booking systems."
+ 2. "Designed and developed a complete ERP-based Vendor Management
+ System, handling vendor onboarding, contract management, invoicing, and
+ approval workflows."
+ Page 1 of 3
+  
+3. "Built backend for a multi-service delivery app supporting parcel, ride,
+ shopping, and gift delivery - designed modular APIs and optimized real-time
+ tracking logic using Redis."
+ 4. "Integrated third-party APIs (Google Maps, Payment Gateways, and AI
+ APIs) to automate operations and improve scalability."
+ 5. "Enhanced system performance through caching strategies, query
+ optimization, and efficient database structuring."
+ 6. "Contributed to product design, scalability decisions, and system security
+ improvements."
+ Freelance
+ Full-stack Developer
+ December 2023 - March 2024 (4 months)
+ Web Techno Software
+ Junior Web Developer
+ November 2022 - September 2023 (11 months)
+ Jodhpur, Rajasthan, India
+ 1. "Started career as a junior developer, learning Laravel framework and the
+ fundamentals of full-stack web application design."
+ 2. "Worked on 2-3 live projects, including a CRM platform and a Property
+ Management SaaS application, contributing to backend logic, user
+ authentication, and UI integration."
+ 3. "Learned to design applications from scratch - planning database
+ architecture, defining user roles, and creating secure, modular APIs."
+ 4. "Gained practical experience in web security, performance optimization, and
+ product lifecycle development from concept to deployment."
+ Education
+ Bikaner Technical University
+ Master of Computer Applications - MCA, Computer Science · (October
+ 2023 - October 2025)
+ Page 2 of 3
+  
+Lachoo Memorial College of Science & Tech
+ BCA, Computer Science · (2019 - 2022

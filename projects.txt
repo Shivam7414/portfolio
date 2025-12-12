@@ -1,0 +1,100 @@
+Myrentalspot
+Myrentalspot
+Dec 2022 - Sep 2023Dec 2022 - Sep 2023
+Company logo
+Associated with Web Techno Software
+Associated with Web Techno Software
+A SaaS rental management system built on Laravel. Handles property listings, booking, and secure payments with Stripe.
+
+Impact: Reduced manual workload by 60% through automated booking and verification.
+A SaaS rental management system built on Laravel. Handles property listings, booking, and secure payments with Stripe. Impact: Reduced manual workload by 60% through automated booking and verification.
+Skills: Laravel · Stripe · Google Maps API · REST APIs · Git · Bootstrap · Amazon Web Services (AWS) · Amazon S3 · Bitbucket
+Skills: Laravel · Stripe · Google Maps API · REST APIs · Git · Bootstrap · Amazon Web Services (AWS) · Amazon S3 · Bitbucket
+
+MyrentalspotMyrentalspot
+Real Estate Review
+Real Estate Review
+Aug 2023 - Sep 2023Aug 2023 - Sep 2023
+Company logo
+Associated with Web Techno Software
+Associated with Web Techno Software
+Review-sharing platform where renters can submit verified experiences. Integrated admin verification and map-based listings.
+Review-sharing platform where renters can submit verified experiences. Integrated admin verification and map-based listings.
+Skills: Google Maps API · Laravel · Git · JavaScript · Bootstrap
+Skills: Google Maps API · Laravel · Git · JavaScript · Bootstrap
+Real Estate ReviewReal Estate Review
+Enterprise Vendor & Workforce Management System
+Enterprise Vendor & Workforce Management System
+Company logo
+Associated with Maxaix
+Associated with Maxaix
+I worked on a full-stack enterprise system built entirely in Laravel, designed to manage vendors, employees, contracts, rate structures, and time-based work reporting. The platform includes multiple user roles with clearly defined responsibilities, supporting a complete workflow from vendor setup to final billing approval.
+
+I built major backend modules, implemented complex business logic, and developed the entire frontend interface. The system handles vendor onboarding, employee assignment, automated rate calculations, resource tracking, and a multi-level review process for submitted work reports. I also worked with queues and background jobs to keep the workflow stable and scalable.
+
+Highlights:
+• Full Laravel (backend + frontend) implementation
+• Multi-role access system (Admin, Reviewer, Vendor Manager)
+• Vendor, employee, contract, and rate-structure management
+• Automated rate selection using effective dates
+• Work-report creation with resource usage tracking
+• Multi-stage approval workflow for reporting and billing
+• Queues and background jobs for reliable processing
+I worked on a full-stack enterprise system built entirely in Laravel, designed to manage vendors, employees, contracts, rate structures, and time-based work reporting. The platform includes multiple user roles with clearly defined responsibilities, supporting a complete workflow from vendor setup to final billing approval. I built major backend modules, implemented complex business logic, and developed the entire frontend interface. The system handles vendor onboarding, employee assignment, automated rate calculations, resource tracking, and a multi-level review process for submitted work reports. I also worked with queues and background jobs to keep the workflow stable and scalable. Highlights: • Full Laravel (backend + frontend) implementation • Multi-role access system (Admin, Reviewer, Vendor Manager) • Vendor, employee, contract, and rate-structure management • Automated rate selection using effective dates • Work-report creation with resource usage tracking • Multi-stage approval workflow for reporting and billing • Queues and background jobs for reliable processing
+Indikosh
+Indikosh
+Company logo
+Associated with Maxaix
+Associated with Maxaix
+I built Indikosh using Laravel as a complete travel and voucher-purchase platform. The system provides flight, bus, and hotel booking services along with the option to purchase digital gift vouchers. I implemented secure payments using the Easebuzz payment gateway and created a full admin panel to manage bookings, vouchers, users, and system settings. I also developed REST APIs for the mobile app, ensuring a smooth and scalable integration layer.
+
+Key Highlights:
+• Laravel-based travel and voucher system
+• Flight, bus, and hotel booking features
+• Digital gift voucher purchase module
+• Integrated Easebuzz for secure online payments
+• Custom admin panel for full platform control
+• REST API development for mobile app integration
+I built Indikosh using Laravel as a complete travel and voucher-purchase platform. The system provides flight, bus, and hotel booking services along with the option to purchase digital gift vouchers. I implemented secure payments using the Easebuzz payment gateway and created a full admin panel to manage bookings, vouchers, users, and system settings. I also developed REST APIs for the mobile app, ensuring a smooth and scalable integration layer. Key Highlights: • Laravel-based travel and voucher system • Flight, bus, and hotel booking features • Digital gift voucher purchase module • Integrated Easebuzz for secure online payments • Custom admin panel for full platform control • REST API development for mobile app integration
+Skills: Laravel · MySQL · Amazon EC2
+Skills: Laravel · MySQL · Amazon EC2
+
+Indikosh - Travel & Gift Voucher PlatformIndikosh - Travel & Gift Voucher Platform
+Jod Law Firm
+Jod Law Firm
+Associated with Freelance
+Associated with Freelance
+I developed a full trademark-service website for Jod Law Firm using Laravel. The site includes a complete admin panel to manage services, content, consultations, and customer inquiries. It features detailed sections for Trademark Registration, Objection, Opposition, and Renewal with clear CTAs for lead generation.
+
+The project is deployed on AWS EC2 with a secure, optimized server setup.
+I developed a full trademark-service website for Jod Law Firm using Laravel. The site includes a complete admin panel to manage services, content, consultations, and customer inquiries. It features detailed sections for Trademark Registration, Objection, Opposition, and Renewal with clear CTAs for lead generation. The project is deployed on AWS EC2 with a secure, optimized server setup.
+Skills: HTML5 · CSS · JavaScript · Laravel · PHP · Amazon EC2
+Skills: HTML5 · CSS · JavaScript · Laravel · PHP · Amazon EC2
+
+Jod Law FirmJod Law Firm
+SendMePls
+SendMePls
+Company logo
+Associated with Maxaix
+Associated with Maxaix
+SendMePls is the most technically challenging and complete project I’ve built. It’s a multi-service platform created in Laravel with full REST APIs and an admin system. The platform supports two user types-customer and delivery agent-and offers three core services: Parcel Delivery, Ride Booking, and AI-powered Shopping.
+
+Parcel and Ride work similar to Uber: customers create requests, pricing is calculated, and nearby delivery agents receive and accept the job. The Shopping flow is more advanced-customers create a cart, select shops, add items, and the system generates an estimated price using an AI API. After payment, a delivery agent accepts the job, purchases items one by one, and delivers them to the customer.
+
+To make this work reliably, I implemented a real-time system using queues, jobs, events, Redis, and WebSockets. The platform also includes live driver tracking and a high-performance architecture designed for continuous updates without delays.
+
+Key Highlights:
+• Built entire platform in Laravel with REST APIs
+• Two user types: Customer & Delivery Agent
+• Services: Parcel Delivery, Ride Booking, AI-powered Shopping
+• Real-time location tracking (Redis + WebSocket events)
+• Queue & Job system for stable, async task processing
+• AI-based price estimation for shopping orders
+• Delivery flow where agent purchases items in real time
+• Full admin panel for managing users, categories, pricing, and requests
+• Production-ready architecture designed for speed and reliability
+SendMePls is the most technically challenging and complete project I’ve built. It’s a multi-service platform created in Laravel with full REST APIs and an admin system. The platform supports two user types-customer and delivery agent-and offers three core services: Parcel Delivery, Ride Booking, and AI-powered Shopping. Parcel and Ride work similar to Uber: customers create requests, pricing is calculated, and nearby delivery agents receive and accept the job. The Shopping flow is more advanced-customers create a cart, select shops, add items, and the system generates an estimated price using an AI API. After payment, a delivery agent accepts the job, purchases items one by one, and delivers them to the customer. To make this work reliably, I implemented a real-time system using queues, jobs, events, Redis, and WebSockets. The platform also includes live driver tracking and a high-performance architecture designed for continuous updates without delays. Key Highlights: • Built entire platform in Laravel with REST APIs • Two user types: Customer & Delivery Agent • Services: Parcel Delivery, Ride Booking, AI-powered Shopping • Real-time location tracking (Redis + WebSocket events) • Queue & Job system for stable, async task processing • AI-based price estimation for shopping orders • Delivery flow where agent purchases items in real time • Full admin panel for managing users, categories, pricing, and requests • Production-ready architecture designed for speed and reliability
+Skills: Laravel · Redis · WebSocket · Queues · Amazon EC2
+Skills: Laravel · Redis · WebSocket · Queues · Amazon EC2
+
+SendMePls: Shopping & Rides

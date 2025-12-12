@@ -3,17 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Shivam Kumar - Backend architect crafting scalable Laravel systems. 2+ years building production-grade SaaS, delivery platforms, and enterprise solutions.">
-    <title>Shivam Kumar | Backend Systems Architect</title>
+    <title>Shivam Kumar | System Architect & Software Engineer</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Shivam Kumar is a System Architect and Software Engineer specializing in building scalable distributed systems, intelligent automation, and high-performance Laravel/AWS architectures.">
+    <meta name="keywords" content="Shivam Kumar, System Architect, Software Engineer, Full Stack Developer, Laravel, AWS, Distributed Systems, Redis, WebSockets, PHP, Intelligent Automation, Backend Engineer">
+    <meta name="author" content="Shivam Kumar">
+    <link rel="canonical" href="https://shivamk.dev/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shivamk.dev/">
+    <meta property="og:title" content="Shivam Kumar | System Architect & Software Engineer">
+    <meta property="og:description" content="Building scalable distributed systems and intelligent automation. Expert in Laravel, AWS, and Real-Time Architectures.">
+    <meta property="og:image" content="https://shivamk.dev/assets/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://shivamk.dev/">
+    <meta property="twitter:title" content="Shivam Kumar | System Architect & Software Engineer">
+    <meta property="twitter:description" content="Building scalable distributed systems and intelligent automation. Expert in Laravel, AWS, and Real-Time Architectures.">
+    <meta property="twitter:image" content="https://shivamk.dev/assets/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="shortcut icon" href="favicon/favicon.ico">
+
+    <!-- Styles & Fonts -->
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
     <!-- Background Elements -->
-    <div class="bg-noise"></div>
-    <div class="bg-grid-lines"></div>
+    <canvas id="bg-canvas"></canvas> <!-- Canvas for Dynamic Network Animation -->
 
     <!-- Navigation -->
     <header class="header">
@@ -22,12 +52,13 @@
                 <span class="logo-text">Shivam</span>
             </a>
             <div class="nav-links">
-                <a href="#about" class="nav-link">About</a>
-                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#values" class="nav-link">Method</a>
+                <a href="#skills" class="nav-link">Stack</a>
+                <a href="#capabilities" class="nav-link">Capabilities</a>
                 <a href="#work" class="nav-link">Work</a>
-                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#experience" class="nav-link">Journey</a>
             </div>
-            <a href="#contact" class="btn-primary nav-cta">Let's Talk</a>
+            <a href="#contact" class="btn-primary nav-cta">Lets Talk</a>
             <button class="nav-toggle" aria-label="Menu">
                 <span></span>
                 <span></span>
@@ -38,11 +69,12 @@
     <!-- Mobile Menu -->
     <div class="mobile-nav">
         <div class="mobile-nav-inner">
-            <a href="#about" class="mobile-link">About</a>
-            <a href="#skills" class="mobile-link">Skills</a>
+            <a href="#values" class="mobile-link">Method</a>
+            <a href="#skills" class="mobile-link">Stack</a>
+            <a href="#capabilities" class="mobile-link">Capabilities</a>
             <a href="#work" class="mobile-link">Work</a>
-            <a href="#experience" class="mobile-link">Experience</a>
-            <a href="#contact" class="mobile-link">Let's Talk</a>
+            <a href="#experience" class="mobile-link">Journey</a>
+            <a href="#contact" class="mobile-link">Lets Talk</a>
         </div>
     </div>
 
@@ -53,127 +85,138 @@
                 <div class="hero-content">
                     <div class="hero-accent-line reveal-slide-left"></div>
                     <h1 class="hero-title reveal-text">
-                        Architecting <br>
-                        <span class="text-accent">Scalable Backends.</span>
+                        Building Scalable Software Suites <br>
+                        <span class="text-accent">& Intelligent Systems.</span>
                     </h1>
                     <p class="hero-subtitle reveal-text delay-1">
-                        I build production-grade Laravel architectures, real-time systems, and AI-integrated platforms. 
-                        Code that scales, systems that perform.
+                        I am a Software Engineer and System Architect solving complex business problems. From designing cloud-native backends to optimizing frontend workflows, I build end-to-end products that perform.
                     </p>
                     <div class="hero-actions reveal-text delay-2">
-                        <a href="#work" class="btn-primary magnetic">View Projects</a>
-                        <a href="#contact" class="btn-secondary magnetic">Contact Me</a>
+                        <a href="#work" class="btn-primary magnetic">View My Work</a>
+                        <a href="#skills" class="btn-secondary magnetic">Technical Stack</a>
                     </div>
                 </div>
+                <!-- Abstract Geometric Visual / Code -->
                 <div class="hero-visual reveal-fade delay-3">
-                    <!-- Abstract Geometric Visual -->
-                    <div class="geo-shape shape-1"></div>
-                    <div class="geo-shape shape-2"></div>
                     <div class="code-snippet">
                         <pre><code><span class="k">class</span> <span class="c">SystemArchitect</span> {
-            <span class="k">public function</span> <span class="f">build</span>() {
-                <span class="k">return</span> [
-                    <span class="s">'scalability'</span> => <span class="k">true</span>,
-                    <span class="s">'performance'</span> => <span class="s">'optimized'</span>,
-                    <span class="s">'reliability'</span> => <span class="s">'99.9%'</span>
-                ];
-            }
-        }</code></pre>
+    <span class="k">public function</span> <span class="f">build</span>() {
+        <span class="k">return</span> [
+            <span class="s">'architecture'</span> => <span class="s">'Distributed'</span>,
+            <span class="s">'uptime'</span> => <span class="s">'99.9%'</span>,
+            <span class="s">'security'</span> => <span class="s">'Strict'</span>
+        ];
+    }
+}</code></pre>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ABOUT SECTION -->
-        <section id="about" class="about-section">
+        <!-- ENGINEERING PHILOSOPHY -->
+        <section id="values" class="mindset-section">
             <div class="container">
                 <div class="section-header reveal-text">
-                    <span class="section-label">01. About</span>
-                    <h2 class="section-title">Engineering with Purpose</h2>
+                    <span class="section-label">01. Method</span>
+                    <h2 class="section-title">The Engineering Mindset</h2>
                 </div>
-                <div class="about-grid">
-                    <div class="about-text reveal-text delay-1">
-                        <p>
-                            I’m a Backend-focused Software Engineer who builds end-to-end platforms—focusing on performance, scalability, and reliability. I specialize in designing <strong>Laravel architectures</strong>, <strong>Real-time systems</strong> (Redis, WebSockets), and <strong>AI engineering</strong> (RAG, Vector DBs).
-                        </p>
-                        <p>
-                            My approach is simple: I don't just write code; I engineer systems. From schema-driven retrieval in AI agents to optimizing MySQL queries for high-load SaaS platforms, I ensure every component builds towards a robust, scalable architecture.
-                        </p>
+                <div class="mindset-grid">
+                    <div class="mindset-card reveal-fade delay-1">
+                        <div class="mindset-icon"><i data-feather="shield"></i></div>
+                        <h3>Reliability & Scale</h3>
+                        <p>I design systems that can survive peak traffic. Circuit breakers, improved database indexing, and efficient caching are my standard tools.</p>
                     </div>
-                    <div class="about-stats reveal-fade delay-2">
-                        <div class="stat-item">
-                            <span class="stat-number">2+</span>
-                            <span class="stat-label">Years Experience</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">10+</span>
-                            <span class="stat-label">Projects Shipped</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">100%</span>
-                            <span class="stat-label">Commitment</span>
-                        </div>
+                    <div class="mindset-card reveal-fade delay-2">
+                        <div class="mindset-icon"><i data-feather="grid"></i></div>
+                        <h3>Product Ownership</h3>
+                        <p>I don't just close tickets. I own the lifecycle—from schema design and API specs to deployment and CI/CD pipelines.</p>
+                    </div>
+                    <div class="mindset-card reveal-fade delay-3">
+                        <div class="mindset-icon"><i data-feather="cpu"></i></div>
+                        <h3>Practical Intelligence</h3>
+                        <p>I use AI as a powerful engineering tool, integrating it only where it solves a real user problem (like automating manual workflows).</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SKILLS SECTION -->
+        <!-- SKILLS / TECH STACK SECTION (New) -->
         <section id="skills" class="skills-section">
             <div class="container">
                 <div class="section-header reveal-text">
-                    <span class="section-label">02. Expertise</span>
+                    <span class="section-label">02. Toolkit</span>
                     <h2 class="section-title">Technical Arsenal</h2>
                 </div>
-                <div class="skills-grid">
-                    <!-- Backend -->
-                    <div class="skill-category reveal-fade delay-1">
-                        <h3 class="category-title">Core Backend</h3>
-                        <p class="category-desc">High-performance server-side architecture.</p>
-                        <ul class="skill-list">
-                            <li>Laravel & PHP</li>
-                            <li>Node.js</li>
-                            <li>REST API Ecosystems</li>
-                            <li>Redis & Caching</li>
-                            <li>WebSockets (Real-time)</li>
-                            <li>Queues & Jobs</li>
-                            <li>Event-Driven Architecture</li>
+                <div class="skills-grid reveal-fade">
+                    <div class="skill-category">
+                        <h4>Languages & Core</h4>
+                        <div class="skill-tags">
+                            <span>PHP (Laravel)</span><span>JavaScript (Node.js)</span><span>Python</span><span>SQL</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Infrastructure & Cloud</h4>
+                        <div class="skill-tags">
+                            <span>AWS (EC2, S3)</span><span>Docker</span><span>Redis</span><span>Nginx</span><span>CI/CD</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Architecture</h4>
+                        <div class="skill-tags">
+                            <span>Microservices</span><span>Event-Driven (Queues)</span><span>RESTful APIs</span><span>WebSockets</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h4>AI & Data</h4>
+                        <div class="skill-tags">
+                            <span>OpenAI API</span><span>RAG Pipelines</span><span>Vector DBs</span><span>Data Scraping</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADVANCED CAPABILITIES -->
+        <section id="capabilities" class="capabilities-section">
+            <div class="container">
+                <div class="section-header reveal-text">
+                    <span class="section-label">03. Stack Expansion</span>
+                    <h2 class="section-title">Advanced Engineering Capabilities</h2>
+                    <p class="section-subtitle">"I understand the full stack, including the new AI layer."</p>
+                </div>
+
+                <div class="capabilities-grid">
+                    <!-- Column 1 -->
+                    <div class="cap-card reveal-slide-left">
+                        <div class="cap-title">
+                            <i data-feather="server"></i> System Architecture
+                        </div>
+                        <ul class="cap-list">
+                            <li>Distributed Systems (Laravel/Redis)</li>
+                            <li>Queue Worker Optimization</li>
+                            <li>Database Normalization & Sharding</li>
                         </ul>
                     </div>
-                    <!-- Data & AI -->
-                    <div class="skill-category reveal-fade delay-2">
-                        <h3 class="category-title">Data & AI Engineering</h3>
-                        <p class="category-desc">Intelligent retrieval and optimized schemas.</p>
-                        <ul class="skill-list">
-                            <li>MySQL (Indexing, Tuning)</li>
-                            <li>RAG Systems</li>
-                            <li>Vector Databases</li>
-                            <li>Embedding Pipelines</li>
-                            <li>Text-to-SQL Agents</li>
-                            <li>Prompt Engineering</li>
+                    <!-- Column 2 -->
+                    <div class="cap-card reveal-slide-left delay-1">
+                        <div class="cap-title">
+                            <i data-feather="zap"></i> Smart Automation
+                        </div>
+                        <ul class="cap-list">
+                            <li>RAG Pipelines (Vector Search)</li>
+                            <li>Context-Aware Agents</li>
+                            <li>Automated Document Parsing</li>
                         </ul>
                     </div>
-                    <!-- DevOps -->
-                    <div class="skill-category reveal-fade delay-3">
-                        <h3 class="category-title">Cloud & DevOps</h3>
-                        <p class="category-desc">Reliable infrastructure and deployment.</p>
-                        <ul class="skill-list">
-                            <li>AWS EC2</li>
-                            <li>Linux Server Management</li>
-                            <li>CI/CD Pipelines</li>
-                            <li>Git & Version Control</li>
-                            <li>System Security</li>
-                        </ul>
-                    </div>
-                    <!-- Integrations -->
-                    <div class="skill-category reveal-fade delay-4">
-                        <h3 class="category-title">Integrations</h3>
-                        <p class="category-desc">Connecting external services seamlessly.</p>
-                        <ul class="skill-list">
-                            <li>Google Maps API</li>
-                            <li>Stripe & Razorpay</li>
-                            <li>Easebuzz</li>
-                            <li>OpenAI API</li>
+                    <!-- Column 3 -->
+                    <div class="cap-card reveal-slide-left delay-2">
+                        <div class="cap-title">
+                            <i data-feather="activity"></i> Real-Time Ops
+                        </div>
+                        <ul class="cap-list">
+                            <li>WebSockets & Event Broadcasting</li>
+                            <li>Live Geolocation Tracking</li>
+                            <li>Async Job Processing</li>
                         </ul>
                     </div>
                 </div>
@@ -184,317 +227,228 @@
         <section id="work" class="work-section">
             <div class="container">
                 <div class="section-header reveal-text">
-                    <span class="section-label">03. Work</span>
-                    <h2 class="section-title">Selected Projects</h2>
+                    <span class="section-label">04. Production</span>
+                    <h2 class="section-title">Featured Projects</h2>
                 </div>
                 <div class="projects-list">
-                <div class="projects-list">
                     
-                    <!-- Project 1: SendMePls -->
+                    <!-- Project 1: Maxaix ERP -->
                     <article class="project-card reveal-fade">
                         <div class="project-header">
-                            <h3 class="project-title">SendMePls</h3>
-                            <div class="tech-tags">
-                                <span>[Real-Time System]</span><span>[Laravel]</span><span>[Redis]</span><span>[WebSockets]</span><span>[AI Integration]</span>
-                            </div>
-                        </div>
-                        
-                        <p class="impact-statement">
-                            "A real-time logistics engine powering parcel, ride, and AI-driven shopping workflows."
-                        </p>
-
-                        <div class="arch-grid">
-                            <div class="arch-details">
-                                <h4>Architecture Highlights</h4>
-                                <ul class="arch-list">
-                                    <li><strong>Redis Real-time Pub/Sub:</strong> Sub-100ms latency for driver tracking broadcasts.</li>
-                                    <li><strong>Queue-Based Consistency:</strong> Decoupled order matching logic to Ensure 99.9% uptime during spikes.</li>
-                                    <li><strong>Scalable REST API:</strong> Modular service design for distinct Customer, Driver, and Admin apps.</li>
-                                    <li><strong>AI Price Estimation:</strong> ML-integrated pipeline for unlisted item cost prediction.</li>
-                                </ul>
-                            </div>
-                            <div class="arch-visual">
-                                <h4>System Flow Snapshot</h4>
-                                <div class="ascii-diagram">
-Customer Req → [Queue] → [Worker] → [Redis]
-                                      ↓
-                                  [WebSocket]
-                                      ↓
-                                  [Driver UI]
+                            <div class="project-title-group">
+                                <h3 class="project-title">Enterprise Vendor ERP</h3>
+                                <div class="project-links">
+                                    <a href="#" class="link-item"><i data-feather="external-link"></i> Live Demo</a>
+                                    <span class="link-divider">|</span>
+                                    <span class="company-tag">Maxaix</span>
                                 </div>
                             </div>
+                            <div class="tech-tags">
+                                <span><i data-feather="layers"></i> System Architect</span>
+                                <span><i data-feather="database"></i> Laravel</span>
+                                <span><i data-feather="cpu"></i> AI Module</span>
+                            </div>
                         </div>
 
-                        <div class="code-insight">
-                            <h4>Code Insight: Location Broadcasting</h4>
-                            <pre><code><span class="k">public function</span> <span class="f">broadcastLocation</span>(<span class="v">$driverId</span>, <span class="v">$coords</span>) {
-    <span class="c">Redis</span>::<span class="f">publish</span>(<span class="s">'drivers.live'</span>, json_encode([
-        <span class="s">'id'</span> => <span class="v">$driverId</span>,
-        <span class="s">'geo'</span> => <span class="v">$coords</span>,
-        <span class="s">'ts'</span> => microtime(<span class="k">true</span>)
-    ]));
-}</code></pre>
-                        </div>
-
-                        <div class="project-links">
-                            <a href="#" class="link-item">Live Demo <span class="arrow">→</span></a>
-                            <a href="#" class="link-item">View Architecture <span class="arrow">→</span></a>
+                        <div class="project-content-grid">
+                            <div class="project-info">
+                                <div class="info-block">
+                                    <h4>The Problem</h4>
+                                    <p>A complex enterprise ecosystem needed to digitize vendor management, billing, and compliance. The logic required handling thousands of rules and approval states.</p>
+                                </div>
+                                <div class="info-block">
+                                    <h4>My Role</h4>
+                                    <p><strong>System Architect & Lead.</strong> Designed the database schema, API layer, and frontend interfaces.</p>
+                                </div>
+                            </div>
+                            <div class="project-tech">
+                                <h4>Engineering Highlights</h4>
+                                <ul class="arch-list">
+                                    <li><strong>Core Platform:</strong> Multi-tenant Laravel app handling vendor lifecycles.</li>
+                                    <li><strong>Complex Billing:</strong> Engineered a "Temporal Database" structure for effective-dated rate changes.</li>
+                                    <li><strong>Intelligent Module:</strong> Integrated a RAG-based AI assistant for contract querying.</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
 
-                    <!-- Project 2: Enterprise Vendor ERP -->
+                    <!-- Project 2: SendMePls -->
                     <article class="project-card reveal-fade">
                         <div class="project-header">
-                            <h3 class="project-title">Enterprise Vendor ERP</h3>
-                            <div class="tech-tags">
-                                <span>[ERP]</span><span>[RAG Agent]</span><span>[Laravel]</span><span>[RBAC]</span><span>[High Complexity]</span>
-                            </div>
-                        </div>
-
-                        <p class="impact-statement">
-                            "Full-stack ERP automating vendor lifecycles with AI-powered reporting agents."
-                        </p>
-
-                        <div class="arch-grid">
-                            <div class="arch-details">
-                                <h4>Architecture Highlights</h4>
-                                <ul class="arch-list">
-                                    <li><strong>RAG Pipeline Integration:</strong> Text-to-SQL agent for querying complex vendor datasets.</li>
-                                    <li><strong>Multi-Role Access Control:</strong> Granular permissions engine for Admin, Reviewer, and Vendors.</li>
-                                    <li><strong>Contract & Rate Engine:</strong> Temporal logic for handling effective-dated billing rules.</li>
-                                    <li><strong>Approval State Machine:</strong> Directed graph workflow for multi-stage bill processing.</li>
-                                </ul>
-                            </div>
-                            <div class="arch-visual">
-                                <h4>System Flow Snapshot</h4>
-                                <div class="ascii-diagram">
-Query → [Embeddings] → [Vector DB] → [SQL Agent]
-                                          ↓
-                                    [Generated SQL]
-                                          ↓
-                                     [Data Report]
+                            <div class="project-title-group">
+                                <h3 class="project-title">SendMePls (Logistics)</h3>
+                                <div class="project-links">
+                                    <a href="#" class="link-item"><i data-feather="github"></i> Private Repo</a>
+                                    <span class="link-divider">|</span>
+                                    <span class="company-tag">Maxaix</span>
                                 </div>
                             </div>
+                            <div class="tech-tags">
+                                <span><i data-feather="server"></i> Backend Lead</span>
+                                <span><i data-feather="map"></i> Real-Time</span>
+                                <span><i data-feather="radio"></i> WebSockets</span>
+                            </div>
                         </div>
 
-                        <div class="code-insight">
-                            <h4>Code Insight: AI SQL Agent</h4>
-                            <pre><code><span class="v">$context</span> = <span class="v">$vectorDB</span>-><span class="f">similaritySearch</span>(<span class="v">$query</span>);
-<span class="v">$sql</span> = <span class="v">$aiAgent</span>-><span class="f">generateQuery</span>([
-    <span class="s">'schema'</span> => <span class="v">$dbSchema</span>,
-    <span class="s">'prompt'</span> => <span class="v">$query</span>,
-    <span class="s">'context'</span> => <span class="v">$context</span>
-]);
-<span class="k">return</span> <span class="c">DB</span>::<span class="f">select</span>(<span class="v">$sql</span>);</code></pre>
-                        </div>
-
-                        <div class="project-links">
-                            <a href="#" class="link-item">Live Demo <span class="arrow">→</span></a>
-                            <a href="#" class="link-item">View Architecture <span class="arrow">→</span></a>
+                        <div class="project-content-grid">
+                            <div class="project-info">
+                                <div class="info-block">
+                                    <h4>The Problem</h4>
+                                    <p>Competing with Uber/DoorDash requires sub-second latency for real-time geolocation and order matching.</p>
+                                </div>
+                                <div class="info-block">
+                                    <h4>My Role</h4>
+                                    <p><strong>Lead Backend Engineer.</strong> Built the "nervous system"—APIs, DB, and events.</p>
+                                </div>
+                            </div>
+                            <div class="project-tech">
+                                <h4>Engineering Highlights</h4>
+                                <ul class="arch-list">
+                                    <li><strong>Real-Time Engine:</strong> WebSocket layer broadcasting driver locations (<100ms latency).</li>
+                                    <li><strong>Concurrency:</strong> Offloaded heavy matching algorithms to async Queue Workers.</li>
+                                    <li><strong>Smart Features:</strong> NLP-based shopping list parser.</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
 
                     <!-- Project 3: Indikosh -->
                     <article class="project-card reveal-fade">
                         <div class="project-header">
-                            <h3 class="project-title">Indikosh</h3>
-                            <div class="tech-tags">
-                                <span>[Booking Engine]</span><span>[Payment Gateway]</span><span>[REST API]</span><span>[Laravel]</span>
-                            </div>
-                        </div>
-
-                        <p class="impact-statement">
-                            "Unified travel aggregation platform for flight, bus, and hotel inventories."
-                        </p>
-
-                        <div class="arch-grid">
-                            <div class="arch-details">
-                                <h4>Architecture Highlights</h4>
-                                <ul class="arch-list">
-                                    <li><strong>Unified Booking Interface:</strong> Polymorphic design to handle distinct booking types (Flight vs Hotel).</li>
-                                    <li><strong>Secure Payment Integration:</strong> HMAC-signed payload verification for Easebuzz gateway.</li>
-                                    <li><strong>Digital Voucher System:</strong> Cryptographically secure token generation for instant redemption.</li>
-                                    <li><strong>Low-Latency API:</strong> Caching layer (Redis) for high-frequency inventory searches.</li>
-                                </ul>
-                            </div>
-                            <div class="arch-visual">
-                                <h4>System Flow Snapshot</h4>
-                                <div class="ascii-diagram">
-User → [Search Aggregator] → [Inventory Cache]
-                                    ↓
-[Booking] ← (Webhook) ← [Payment Gateway]
-    ↓
-[Voucher Gen]
+                            <div class="project-title-group">
+                                <h3 class="project-title">Indikosh (Travel)</h3>
+                                <div class="project-links">
+                                    <span class="company-tag">Maxaix</span>
                                 </div>
                             </div>
+                            <div class="tech-tags">
+                                <span><i data-feather="globe"></i> API Strategy</span>
+                                <span><i data-feather="lock"></i> Security</span>
+                            </div>
                         </div>
 
-                        <div class="code-insight">
-                            <h4>Code Insight: Polymorphic Booking</h4>
-                            <pre><code><span class="k">interface</span> <span class="c">Bookable</span> {
-    <span class="k">public function</span> <span class="f">lockInventory</span>();
-    <span class="k">public function</span> <span class="f">confirm</span>(<span class="v">$paymentId</span>);
-}
-
-<span class="k">class</span> <span class="c">FlightBooking</span> <span class="k">implements</span> <span class="c">Bookable</span> { ... }</code></pre>
-                        </div>
-
-                        <div class="project-links">
-                            <a href="#" class="link-item">Live Demo <span class="arrow">→</span></a>
-                            <a href="#" class="link-item">View Architecture <span class="arrow">→</span></a>
+                        <div class="project-content-grid">
+                            <div class="project-info">
+                                <div class="info-block">
+                                    <h4>The Challenge</h4>
+                                    <p>Aggregating disparate APIs (Flight, Hotel, Bus) into a single, unified booking experience is messy.</p>
+                                </div>
+                                <div class="info-block">
+                                    <h4>Solution</h4>
+                                    <p>Designed a <strong>Polymorphic API</strong> that normalizes data from 5+ providers. Implemented atomic transactions and HMAC verification for fail-safe payments.</p>
+                                </div>
+                            </div>
+                            <div class="project-tech">
+                                <h4>Impact</h4>
+                                <ul class="arch-list">
+                                    <li><strong>Maintainability:</strong> New provider integration time reduced from 2 weeks to 2 days.</li>
+                                    <li><strong>Revenue:</strong> Enabled digital voucher cross-selling.</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
-
+                    
                     <!-- Project 4: MyRentalSpot -->
                     <article class="project-card reveal-fade">
                         <div class="project-header">
-                            <h3 class="project-title">MyRentalSpot</h3>
-                            <div class="tech-tags">
-                                <span>[SaaS]</span><span>[Stripe]</span><span>[Geo-Spatial]</span><span>[Automation]</span>
-                            </div>
-                        </div>
-
-                        <p class="impact-statement">
-                            "Automated rental SaaS reducing property verification overhead by 60%."
-                        </p>
-
-                        <div class="arch-grid">
-                            <div class="arch-details">
-                                <h4>Architecture Highlights</h4>
-                                <ul class="arch-list">
-                                    <li><strong>Stripe Connect Logic:</strong> Automated split-payments and managed account payouts.</li>
-                                    <li><strong>Geo-Spatial Indexing:</strong> Haversine implementation for radius-based property discovery.</li>
-                                    <li><strong>Event-Driven Automation:</strong> Listeners for automated verification emails and status transitions.</li>
-                                </ul>
-                            </div>
-                            <div class="arch-visual">
-                                <h4>System Flow Snapshot</h4>
-                                <div class="ascii-diagram">
-Listing → [Geo-Encode] → [Spatial Index]
-                                ↓
-Booking → [Stripe Hold] → [Owner Approve]
-                                ↓
-                        [Capture Charge]
+                            <div class="project-title-group">
+                                <h3 class="project-title">MyRentalSpot (SaaS)</h3>
+                                <div class="project-links">
+                                    <span class="company-tag">Web Techno Software</span>
                                 </div>
                             </div>
+                            <div class="tech-tags">
+                                <span><i data-feather="layout"></i> Full-Stack</span>
+                                <span><i data-feather="settings"></i> Automation</span>
+                            </div>
                         </div>
 
-                        <div class="code-insight">
-                            <h4>Code Insight: Geo-Spatial Query</h4>
-                            <pre><code><span class="c">Property</span>::<span class="f">selectRaw</span>(
-    <span class="s">"*, ( 6371 * acos( cos( radians(?) ) * ... ) ) AS distance"</span>, 
-    [<span class="v">$userLat</span>]
-)-><span class="f">having</span>(<span class="s">'distance'</span>, <span class="s">'<'</span>, <span class="v">$radius</span>)
- -><span class="f">orderBy</span>(<span class="s">'distance'</span>);</code></pre>
-                        </div>
-
-                        <div class="project-links">
-                            <a href="#" class="link-item">Live Demo <span class="arrow">→</span></a>
-                            <a href="#" class="link-item">View Architecture <span class="arrow">→</span></a>
+                        <div class="project-content-grid">
+                            <div class="project-info">
+                                <div class="info-block">
+                                    <h4>What I Built</h4>
+                                    <p>An end-to-end SaaS MVP. Built the Landing page, Auth system, Dashboard, and Admin panels.</p>
+                                </div>
+                            </div>
+                            <div class="project-tech">
+                                <h4>Engineering Highlights</h4>
+                                <ul class="arch-list">
+                                    <li><strong>Automated Workflows:</strong> Cron jobs for invoice generation and late fees.</li>
+                                    <li><strong>Geospatial Search:</strong> Radius-based property discovery using SQL spatial queries.</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
 
                     <!-- Project 5: Real Estate Review -->
                     <article class="project-card reveal-fade">
                         <div class="project-header">
-                            <h3 class="project-title">Real Estate Review</h3>
-                            <div class="tech-tags">
-                                <span>[Trust System]</span><span>[Content Filtering]</span><span>[Google Maps]</span>
-                            </div>
-                        </div>
-
-                        <p class="impact-statement">
-                            "A verified review ecosystem implementing trust-scoring algorithms."
-                        </p>
-
-                        <div class="arch-grid">
-                            <div class="arch-details">
-                                <h4>Architecture Highlights</h4>
-                                <ul class="arch-list">
-                                    <li><strong>Trust Logic:</strong> Weighted scoring algorithm based on user history and proof-of-residency.</li>
-                                    <li><strong>Moderation Pipeline:</strong> Queue-based manual review system for flagged high-risk content.</li>
-                                    <li><strong>Map Clustering:</strong> Server-side cluster generation for high-density map views.</li>
-                                </ul>
-                            </div>
-                            <div class="arch-visual">
-                                <h4>System Flow Snapshot</h4>
-                                <div class="ascii-diagram">
-Review → [Spam Check] → [Trust Score Calc]
-                                ↓
-                         [Moderation Queue]
-                                ↓
-                         [Map Cluster Update]
+                            <div class="project-title-group">
+                                <h3 class="project-title">Real Estate Review</h3>
+                                <div class="project-links">
+                                    <a href="#" class="link-item"><i data-feather="external-link"></i> Live Demo</a>
+                                    <span class="link-divider">|</span>
+                                    <span class="company-tag">Web Techno Software</span>
                                 </div>
                             </div>
+                            <div class="tech-tags">
+                                <span><i data-feather="map-pin"></i> Google Maps API</span>
+                                <span><i data-feather="layout"></i> Bootstrap</span>
+                            </div>
                         </div>
 
-                        <div class="code-insight">
-                            <h4>Code Insight: Trust Score Logic</h4>
-                            <pre><code><span class="v">$score</span> = <span class="v">$user</span>-><span class="f">reputation</span> * <span class="v">$WEIGHT_REP</span>;
-<span class="k">if</span> (<span class="v">$review</span>-><span class="f">hasProof</span>()) {
-    <span class="v">$score</span> += <span class="v">$BONUS_PROOF</span>;
-}
-<span class="k">if</span> (<span class="v">$score</span> > <span class="v">$THRESHOLD</span>) {
-    <span class="v">$review</span>-><span class="f">publish</span>();
-}</code></pre>
-                        </div>
-
-                        <div class="project-links">
-                            <a href="#" class="link-item">Live Demo <span class="arrow">→</span></a>
-                            <a href="#" class="link-item">View Architecture <span class="arrow">→</span></a>
+                        <div class="project-content-grid">
+                            <div class="project-info">
+                                <div class="info-block">
+                                    <h4>The Platform</h4>
+                                    <p>A review-sharing platform where renters can submit verified experiences. Features integrated admin verification and map-based listings.</p>
+                                </div>
+                            </div>
+                            <div class="project-tech">
+                                <h4>Engineering Highlights</h4>
+                                <ul class="arch-list">
+                                    <li><strong>Verification System:</strong> Admin-led verification for authentic reviews.</li>
+                                    <li><strong>Interactive Maps:</strong> Map-based property discovery and listing.</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
 
                     <!-- Project 6: Jod Law Firm -->
                     <article class="project-card reveal-fade">
                         <div class="project-header">
-                            <h3 class="project-title">Jod Law Firm</h3>
-                            <div class="tech-tags">
-                                <span>[Legal Tech]</span><span>[AWS]</span><span>[State Machine]</span>
-                            </div>
-                        </div>
-
-                        <p class="impact-statement">
-                            "Digital transformation of trademark services with automated tracking."
-                        </p>
-
-                        <div class="arch-grid">
-                            <div class="arch-details">
-                                <h4>Architecture Highlights</h4>
-                                <ul class="arch-list">
-                                    <li><strong>Service State Machine:</strong> Deterministic transitions for Trademark lifecycles (Applied -> Objected -> Registered).</li>
-                                    <li><strong>AWS Infrastructure:</strong> Managed EC2 instance with automated snapshot backups.</li>
-                                    <li><strong>Notification Engine:</strong> Trigger-based email/SMS alerts for status changes.</li>
-                                </ul>
-                            </div>
-                            <div class="arch-visual">
-                                <h4>System Flow Snapshot</h4>
-                                <div class="ascii-diagram">
-Inquiry → [Case File] → [State: Applied]
-                               ↓
-                      [Registry Trigger]
-                               ↓
-                        [Notify Client]
+                            <div class="project-title-group">
+                                <h3 class="project-title">Jod Law Firm</h3>
+                                <div class="project-links">
+                                    <a href="#" class="link-item"><i data-feather="external-link"></i> Live Demo</a>
+                                    <span class="link-divider">|</span>
+                                    <span class="company-tag">Freelance</span>
                                 </div>
                             </div>
+                            <div class="tech-tags">
+                                <span><i data-feather="layout"></i> Laravel</span>
+                                <span><i data-feather="server"></i> AWS EC2</span>
+                            </div>
                         </div>
 
-                        <div class="code-insight">
-                            <h4>Code Insight: State Transition</h4>
-                            <pre><code><span class="k">public function</span> <span class="f">transitionTo</span>(<span class="v">$newState</span>) {
-    <span class="k">if</span> (!<span class="v">$this</span>->canTransitionTo(<span class="v">$newState</span>)) {
-        <span class="k">throw new</span> <span class="c">InvalidStateTransitionException</span>();
-    }
-    <span class="v">$this</span>-><span class="f">update</span>([<span class="s">'status'</span> => <span class="v">$newState</span>]);
-    <span class="c">Event</span>::<span class="f">dispatch</span>(<span class="k">new</span> <span class="c">StatusChanged</span>(<span class="v">$this</span>));
-}</code></pre>
-                        </div>
-
-                        <div class="project-links">
-                            <a href="#" class="link-item">Live Demo <span class="arrow">→</span></a>
-                            <a href="#" class="link-item">View Architecture <span class="arrow">→</span></a>
+                        <div class="project-content-grid">
+                            <div class="project-info">
+                                <div class="info-block">
+                                    <h4>The Solution</h4>
+                                    <p>A comprehensive trademark-service website with a full admin panel for managing services, consultations, and inquiries.</p>
+                                </div>
+                            </div>
+                            <div class="project-tech">
+                                <h4>Engineering Highlights</h4>
+                                <ul class="arch-list">
+                                    <li><strong>Content Management:</strong> Custom admin panel for service and content updates.</li>
+                                    <li><strong>Lead Generation:</strong> Optimized flow for consultations and trademark registration.</li>
+                                    <li><strong>Infrastructure:</strong> Secure deployment on AWS EC2.</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
+
                 </div>
             </div>
         </section>
@@ -503,26 +457,20 @@ Inquiry → [Case File] → [State: Applied]
         <section id="experience" class="experience-section">
             <div class="container">
                 <div class="section-header reveal-text">
-                    <span class="section-label">04. Path</span>
-                    <h2 class="section-title">Professional Journey</h2>
+                    <span class="section-label">05. Journey</span>
+                    <h2 class="section-title">Professional Path</h2>
                 </div>
                 <div class="timeline">
-                    
                     <!-- Role 1 -->
                     <div class="timeline-item reveal-slide-left">
                         <div class="timeline-marker"></div>
                         <div class="timeline-content">
                             <div class="timeline-header">
-                                <h3 class="role-title">Principal Backend Engineer</h3>
+                                <h3 class="role-title">Senior Software Engineer</h3>
                                 <span class="company-name">Maxaix</span>
                                 <span class="period">March 2024 - Present</span>
                             </div>
-                            <ul class="role-details">
-                                <li><strong>Architecture:</strong> Leading backend architecture for scalable hotel, flight, and bus booking engines.</li>
-                                <li><strong>ERP Systems:</strong> Designed a complete Vendor Management System (VMS) with complex approval workflows.</li>
-                                <li><strong>Optimization:</strong> Optimized Redis caching strategies for a high-traffic delivery platform.</li>
-                                <li><strong>Integrations:</strong> Seamlessly integrated Google Maps, Easebuzz, & AI APIs for automated operations.</li>
-                            </ul>
+                            <p class="role-desc">Leading the development of enterprise-grade platforms. My focus is on writing clean, maintainable code and designing architectures that scale. I also lead the initiative to integrate practical AI features into our internal tools.</p>
                         </div>
                     </div>
 
@@ -531,15 +479,11 @@ Inquiry → [Case File] → [State: Applied]
                         <div class="timeline-marker"></div>
                         <div class="timeline-content">
                             <div class="timeline-header">
-                                <h3 class="role-title">Full Stack Consultant</h3>
-                                <span class="company-name">Freelance</span>
+                                <h3 class="role-title">Freelance Full-Stack Developer</h3>
+                                <span class="company-name">Remote</span>
                                 <span class="period">Dec 2023 - March 2024</span>
                             </div>
-                            <ul class="role-details">
-                                <li>Delivered production-ready web applications from database design to AWS deployment.</li>
-                                <li>Built a specialized Trademark Service Platform with automated case tracking.</li>
-                                <li>Engineered secure REST APIs for cross-platform mobile integration.</li>
-                            </ul>
+                            <p class="role-desc">Delivered custom web solutions for clients in Real Estate and Law. Gained deep experience in translating business requirements into technical specs and shipping production-ready code.</p>
                         </div>
                     </div>
 
@@ -548,73 +492,46 @@ Inquiry → [Case File] → [State: Applied]
                         <div class="timeline-marker"></div>
                         <div class="timeline-content">
                             <div class="timeline-header">
-                                <h3 class="role-title">Junior Backend Developer</h3>
+                                <h3 class="role-title">Junior Web Developer</h3>
                                 <span class="company-name">Web Techno Software</span>
                                 <span class="period">Nov 2022 - Sep 2023</span>
                             </div>
-                            <ul class="role-details">
-                                <li>Mastered Laravel framework internals and MVC architecture.</li>
-                                <li>Contributed to 3+ live SaaS projects including CRM and Property Management systems.</li>
-                                <li>Focused on database normalization and secure authentication flows.</li>
-                            </ul>
+                            <p class="role-desc">Built the foundation of my engineering skills. Learned MVC patterns, database normalization, and secure coding practices in a high-volume agency.</p>
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
 
         <!-- CONTACT SECTION -->
         <section id="contact" class="contact-section">
-            <div class="container center-text">
-                <div class="section-header reveal-text">
-                    <span class="section-label">05. Connect</span>
-                    <h2 class="section-title">Initialize Handshake</h2>
-                </div>
-                
-                <div class="ide-wrapper reveal-fade">
-                    <div class="ide-container">
-                        <div class="ide-header">
-                            <div class="window-controls">
-                                <span class="control red"></span>
-                                <span class="control yellow"></span>
-                                <span class="control green"></span>
-                            </div>
-                            <div class="file-info">
-                                <span class="file-name">contact.php</span>
-                            </div>
-                        </div>
-                        <div class="ide-body">
-                            <div class="gutter">
-                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span>
-                            </div>
-                            <div class="code-area">
-                                <div class="code-line"><span class="k">use</span>&nbsp;<span class="c">Illuminate\Support\Facades\Mail</span>;</div>
-                                <div class="code-line"><br></div>
-                                <div class="code-line"><span class="k">class</span> <span class="c">&nbsp;ContactController</span> <span class="k">&nbsp;extends&nbsp;</span> <span class="c">Controller&nbsp;</span> {</div>
-                                <div class="code-line indent-1"><span class="k">public function</span> <span class="f">&nbsp;submit</span>() {</div>
-                                <div class="code-line indent-2"><span class="comment">// Define sender details</span></div>
-                                <div class="code-line indent-2"><span class="v">$name</span> = <span class="s">"<input type="text" id="name" class="code-input" placeholder="Your Name" autocomplete="off">"</span>;</div>
-                                <div class="code-line indent-2"><span class="v">$email</span> = <span class="s">"<input type="email" id="email" class="code-input" placeholder="email@example.com" autocomplete="off">"</span>;</div>
-                                <div class="code-line indent-2"><span class="v">$msg</span> = <span class="s">"<input type="text" id="message" class="code-input" placeholder="Your Message..." autocomplete="off">"</span>;</div>
-                                <div class="code-line indent-2"><br></div>
-                                <div class="code-line indent-2"><span class="k">return&nbsp;</span> <span class="f">Mail</span>::<span class="f">to</span>(<span class="s">'ojhashivam7414@gmail.com'</span>)</div>
-                                <div class="code-line indent-3">-><span class="f">send</span>(<span class="v">$name</span>, <span class="v">$email</span>, <span class="v">$msg</span>);</div>
-                                <div class="code-line indent-1">}</div>
-                                <div class="code-line">}</div>
-                            </div>
+            <div class="container">
+                <div class="contact-wrapper reveal-fade">
+                    <div class="contact-left">
+                        <h2 class="contact-catchphrase">Need a Complete Engineer?</h2>
+                        <p class="contact-sub">I build robust systems, secure APIs, and intuitive products. From proper architecture to AI integrations—I deliver software that works.</p>
+                        <div class="social-links">
+                            <a href="https://www.linkedin.com/in/shivam-kumar-ojha" target="_blank" class="social-link">LinkedIn</a>
+                            <a href="mailto:ojhashivam7414@gmail.com" class="social-link">Email</a>
                         </div>
                     </div>
-                    <button class="btn-primary run-code-btn magnetic" id="sendBtn">
-                        <span class="icon">▶</span> Execute Code
-                    </button>
-                    <div id="terminal-output" class="terminal-output"></div>
-                </div>
-
-                <div class="social-links-footer">
-                    <a href="https://www.linkedin.com/in/shivam-kumar-ojha" target="_blank" class="social-link">LinkedIn</a>
-                    <a href="mailto:ojhashivam7414@gmail.com" class="social-link">Email</a>
-                    <a href="tel:+917414887589" class="social-link">+91 7414887589</a>
+                    <div class="contact-right">
+                        <form class="contact-glass-form" action="#" method="POST">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" placeholder="john@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" rows="4" placeholder="Tell me about your project..."></textarea>
+                            </div>
+                            <button type="button" class="btn-primary" id="finalSendBtn">Send Message</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
@@ -622,7 +539,7 @@ Inquiry → [Case File] → [State: Applied]
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Shivam Kumar. Built with precision.</p>
+            <p>&copy; 2025 Shivam Kumar. Building Systems that Scale.</p>
         </div>
     </footer>
 
