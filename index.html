@@ -4,41 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shivam Kumar | Software Developer</title>
-  <meta name="description" content="Software developer building production software end to end: real-time platforms, enterprise systems, payment flows, and AI-powered tools." />
+  <meta name="description" content="Software developer building production-grade software: real-time platforms, distributed systems, AI-powered applications, payments, and large-scale business platforms." />
   <meta name="author" content="Shivam Kumar" />
 
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Shivam Kumar | Software Developer" />
-  <meta property="og:description" content="I build software that ships, scales, and holds up in production. Real-time systems, AI tooling, and payments." />
+  <meta property="og:description" content="I build production-grade software that scales. Real-time systems, distributed architecture, AI &amp; RAG, and payments." />
   <meta property="og:url" content="https://shivamk.dev/" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://shivamk.dev/" />
 
-  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png" />
-  <link rel="icon" href="favicon/favicon.ico" />
-  <link rel="manifest" href="favicon/site.webmanifest" />
+  <link rel="icon" href="favicon/favicon.ico?v=3" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png?v=3" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png?v=3" />
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png?v=3" />
+  <link rel="manifest" href="favicon/site.webmanifest?v=3" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <a class="skip-link" href="#work">Skip to work</a>
+  <div class="cursor-glow" aria-hidden="true"></div>
 
   <!-- ============ HEADER ============ -->
   <header class="site-header" id="top">
-    <div class="shell header__inner">
-      <a class="brand" href="#top" aria-label="Shivam Kumar, home">Shivam Kumar</a>
+    <div class="header__pill">
+      <a class="brand" href="#top" aria-label="Shivam Kumar, home">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span>Shivam Kumar</span>
+      </a>
 
       <nav class="nav" aria-label="Primary">
         <a href="#work">Work</a>
         <a href="#capabilities">Capabilities</a>
+        <a href="#ai">AI</a>
         <a href="#experience">Experience</a>
-        <a href="#contact">Contact</a>
+        <a href="#stack">Stack</a>
       </nav>
 
       <a class="header__cta" href="#contact">
@@ -56,7 +61,9 @@
     <nav class="mobile-menu__nav" aria-label="Mobile">
       <a href="#work">Work</a>
       <a href="#capabilities">Capabilities</a>
+      <a href="#ai">AI &amp; RAG</a>
       <a href="#experience">Experience</a>
+      <a href="#stack">Stack</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="mobile-menu__foot">
@@ -67,278 +74,273 @@
 
   <main>
     <!-- ============ HERO ============ -->
-    <section class="hero shell" id="hero">
-      <p class="hero__kicker">
-        <span class="dot" aria-hidden="true"></span>
-        <span>Software Developer</span>
-        <span class="sep" aria-hidden="true">/</span>
-        <span>Backend &middot; Real-time &middot; AI</span>
-        <span class="sep" aria-hidden="true">/</span>
-        <span>Jodhpur, India</span>
-      </p>
-
-      <div class="hero__grid">
-        <div class="hero__intro">
-          <h1 class="hero__title">
-            I build software that ships, scales, and holds up <em>in&nbsp;production.</em>
-          </h1>
-          <p class="hero__standfirst">
-            Two and a half years building end-to-end products across product teams and enterprise
-            systems. I work the full stack, but my center of gravity is the backend: REST APIs,
-            real-time infrastructure, payment flows, and the AI features layered on top.
-          </p>
-          <div class="hero__actions">
-            <a class="link-cta" href="#work">
-              <span>View selected work</span>
-              <span class="arrow" aria-hidden="true">&#8594;</span>
-            </a>
-            <a class="link-cta link-cta--ghost" href="resume.pdf" download>
-              <span>Download CV</span>
-            </a>
-            <span class="hero__social">
-              <a href="https://github.com/Shivam7414" target="_blank" rel="noopener">GitHub</a>
-              <a href="https://www.linkedin.com/in/shivam-kumar-ojha/" target="_blank" rel="noopener">LinkedIn</a>
-            </span>
-          </div>
-        </div>
-
-        <figure class="hero__diagram diagram-panel" data-diagram="hero">
-          <figcaption class="diagram-cap caption">A system I might build &mdash; services, and the events moving between them. Hover to run it.</figcaption>
-        </figure>
+    <section class="hero" id="hero">
+      <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="hero__fallback" aria-hidden="true">
+        <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Abstract network of connected nodes">
+          <g stroke="#1F3BFF" stroke-opacity="0.28" stroke-width="1">
+            <line x1="140" y1="120" x2="330" y2="220"/><line x1="330" y1="220" x2="540" y2="120"/>
+            <line x1="330" y1="220" x2="470" y2="360"/><line x1="540" y1="120" x2="660" y2="260"/>
+            <line x1="470" y1="360" x2="660" y2="260"/><line x1="140" y1="120" x2="220" y2="330"/>
+            <line x1="220" y1="330" x2="470" y2="360"/><line x1="540" y1="120" x2="690" y2="110"/>
+          </g>
+          <g fill="#9DB0FF">
+            <circle cx="140" cy="120" r="3.5"/><circle cx="330" cy="220" r="5"/><circle cx="540" cy="120" r="4"/>
+            <circle cx="470" cy="360" r="4.5"/><circle cx="660" cy="260" r="3.5"/><circle cx="220" cy="330" r="3"/>
+            <circle cx="690" cy="110" r="2.5"/>
+          </g>
+        </svg>
       </div>
 
-      <div class="hero__strip">
-        <div class="hstrip__block">
-          <span class="caption">Currently</span>
-          <p>Software Developer at <a href="https://maxaix.com" target="_blank" rel="noopener">Maxaix</a> &mdash; real-time, enterprise, and AI-driven products.</p>
-        </div>
-        <div class="hstrip__block">
-          <span class="caption">Focus</span>
-          <p>Real-time systems &middot; AI &amp; RAG &middot; Payment integrations &middot; REST API design &middot; Query performance</p>
+      <div class="shell hero__inner">
+        <p class="hero__kicker">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Software Developer</span>
+          <span class="sep" aria-hidden="true">/</span>
+          <span>Backend &middot; Real-time &middot; AI</span>
+          <span class="sep" aria-hidden="true">/</span>
+          <span>Jodhpur, India</span>
+        </p>
+
+        <h1 class="hero__title">I build production-grade software that <em>scales.</em></h1>
+
+        <p class="hero__standfirst">
+          Full-stack engineer specializing in Laravel, distributed systems, AI-powered
+          applications, and large-scale business platforms.
+        </p>
+
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="resume.pdf" download>
+            <span>Resume</span>
+            <span class="arrow" aria-hidden="true">&#8594;</span>
+          </a>
+          <a class="btn btn--ghost" href="#contact">
+            <span>Contact</span>
+          </a>
+          <span class="hero__social">
+            <a href="https://github.com/Shivam7414" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.linkedin.com/in/shivam-kumar-ojha/" target="_blank" rel="noopener">LinkedIn</a>
+          </span>
         </div>
       </div>
+
+      <a class="hero__cue" href="#work" aria-label="Scroll to work">
+        <span class="caption">Scroll</span>
+        <span class="hero__cue-line" aria-hidden="true"></span>
+      </a>
     </section>
 
     <!-- ============ SELECTED WORK ============ -->
     <section class="section work" id="work">
       <div class="shell">
         <header class="chapter" data-reveal>
-          <span class="chapter__mark" aria-hidden="true">&sect;01</span>
-          <h2 class="chapter__title">Selected Work</h2>
-          <p class="chapter__note">Six products I designed, built, and shipped &mdash; each one drawn as the system it actually is. Hover a diagram to watch the events move.</p>
+          <span class="chapter__mark caption">&sect;01 - Selected Work</span>
+          <h2 class="chapter__title">Six systems, <em>shipped.</em></h2>
+          <p class="chapter__note">Each project is drawn as the architecture it actually is. Hover a diagram to watch the events move between services.</p>
         </header>
 
-        <ol class="plates">
+        <ol class="cases">
           <!-- 01 SendMePls -->
-          <li class="plate" id="sendmepls" data-reveal>
-            <div class="plate__head">
-              <span class="plate__no" aria-hidden="true">01</span>
-              <div>
-                <h3 class="plate__title">SendMePls</h3>
-                <p class="plate__type caption">Real-time multi-service platform &middot; Maxaix &middot; 2024</p>
+          <li class="case" id="sendmepls" data-tilt data-reveal>
+            <div class="case__media"><figure class="case__diagram diagram-panel" data-diagram="sendmepls"></figure></div>
+            <div class="case__body">
+              <header class="case__head">
+                <span class="case__no" aria-hidden="true">01</span>
+                <div>
+                  <h3 class="case__title">SendMePls</h3>
+                  <p class="case__type caption">Real-time multi-service platform &middot; Maxaix &middot; 2024</p>
+                </div>
+              </header>
+              <p class="case__problem"><span class="caption">Problem</span>One app running parcel delivery, ride booking, and AI-assisted shopping. Customers and delivery agents have to stay in sync in real time.</p>
+              <p class="case__challenge"><span class="caption">Technical challenge</span>I built the real-time core: live location tracking on Redis, event delivery over WebSockets, and a queue and job layer that keeps state consistent under load.</p>
+              <div class="case__metrics">
+                <div class="metric"><span class="metric__num">Real-time</span><span class="metric__label caption">tracking</span></div>
+                <div class="metric"><span class="metric__num">Redis &middot; WS</span><span class="metric__label caption">live sync</span></div>
+                <div class="metric"><span class="metric__num">100k+/day</span><span class="metric__label caption">events</span></div>
               </div>
-            </div>
-            <div class="plate__grid">
-              <figure class="plate__diagram diagram-panel" data-diagram="sendmepls"></figure>
-              <div class="plate__text">
-                <p class="plate__desc">
-                  A logistics platform that runs parcel delivery, ride booking, and AI-assisted shopping in one
-                  app. I built the real-time core that keeps customers and delivery agents in sync: live location
-                  tracking on Redis, event delivery over WebSockets, and a queue and job layer that keeps state
-                  consistent under load.
-                </p>
-                <ul class="plate__points">
+              <ul class="taglist"><li>Laravel</li><li>Redis</li><li>WebSockets</li><li>Queues</li><li>REST API</li><li>AWS</li></ul>
+              <button class="case__toggle" data-deepdive aria-expanded="false"><span>Technical deep dive</span><span class="case__toggle-ic" aria-hidden="true">+</span></button>
+              <div class="case__deepdive" hidden>
+                <ul class="case__points">
                   <li>Real-time location tracking and dispatch with Redis and WebSockets</li>
                   <li>Async state handling through a queue and job system</li>
                   <li>AI-driven price estimation for on-demand shopping</li>
                   <li>Two-sided product serving customers and delivery agents</li>
                 </ul>
-                <div class="plate__foot">
-                  <ul class="taglist">
-                    <li>Laravel</li><li>Redis</li><li>WebSockets</li><li>Queues</li><li>REST API</li><li>AWS</li>
-                  </ul>
-                  <div class="plate__links">
-                    <a href="https://play.google.com/store/apps/details?id=com.maxaix.sendmeplscustomerdev" target="_blank" rel="noopener">Customer app <span class="arrow" aria-hidden="true">&#8599;</span></a>
-                    <a href="https://play.google.com/store/apps/details?id=com.maxaix.send_me_pls_agent" target="_blank" rel="noopener">Agent app <span class="arrow" aria-hidden="true">&#8599;</span></a>
-                  </div>
-                </div>
+              </div>
+              <div class="case__links">
+                <a href="https://play.google.com/store/apps/details?id=com.maxaix.sendmeplscustomerdev" target="_blank" rel="noopener">Customer app <span class="arrow" aria-hidden="true">&#8599;</span></a>
+                <a href="https://play.google.com/store/apps/details?id=com.maxaix.send_me_pls_agent" target="_blank" rel="noopener">Agent app <span class="arrow" aria-hidden="true">&#8599;</span></a>
               </div>
             </div>
           </li>
 
           <!-- 02 Indikosh -->
-          <li class="plate plate--flip" id="indikosh" data-reveal>
-            <div class="plate__head">
-              <span class="plate__no" aria-hidden="true">02</span>
-              <div>
-                <h3 class="plate__title">Indikosh</h3>
-                <p class="plate__type caption">Travel booking and voucher platform &middot; Maxaix &middot; 2024</p>
+          <li class="case" id="indikosh" data-tilt data-reveal>
+            <div class="case__media"><figure class="case__diagram diagram-panel" data-diagram="indikosh"></figure></div>
+            <div class="case__body">
+              <header class="case__head">
+                <span class="case__no" aria-hidden="true">02</span>
+                <div>
+                  <h3 class="case__title">Indikosh</h3>
+                  <p class="case__type caption">Travel booking &amp; voucher platform &middot; Maxaix &middot; 2024</p>
+                </div>
+              </header>
+              <p class="case__problem"><span class="caption">Problem</span>A travel and digital-voucher platform offering flight, hotel, and bus booking in one place.</p>
+              <p class="case__challenge"><span class="caption">Technical challenge</span>I integrated the Easebuzz payment gateway and the TripJack and Yatra supplier APIs, and built the REST API powering the mobile app plus an operations admin panel.</p>
+              <div class="case__metrics">
+                <div class="metric"><span class="metric__num">3 supplier</span><span class="metric__label caption">APIs</span></div>
+                <div class="metric"><span class="metric__num">Unified</span><span class="metric__label caption">booking</span></div>
+                <div class="metric"><span class="metric__num">Easebuzz</span><span class="metric__label caption">payments</span></div>
               </div>
-            </div>
-            <div class="plate__grid">
-              <figure class="plate__diagram diagram-panel" data-diagram="indikosh"></figure>
-              <div class="plate__text">
-                <p class="plate__desc">
-                  A travel and digital-voucher platform that offers flight, hotel, and bus booking in one place.
-                  I integrated the Easebuzz payment gateway and built the REST API that powers the mobile app,
-                  along with an admin panel to run day-to-day operations.
-                </p>
-                <ul class="plate__points">
+              <ul class="taglist"><li>Laravel</li><li>MySQL</li><li>REST API</li><li>TripJack</li><li>Yatra</li><li>Easebuzz</li></ul>
+              <button class="case__toggle" data-deepdive aria-expanded="false"><span>Technical deep dive</span><span class="case__toggle-ic" aria-hidden="true">+</span></button>
+              <div class="case__deepdive" hidden>
+                <ul class="case__points">
                   <li>Unified booking across flights, hotels, and buses</li>
                   <li>Supplier integrations with the TripJack and Yatra APIs</li>
                   <li>Online payments through the Easebuzz gateway</li>
                   <li>REST API for the mobile app plus an operations admin panel</li>
                 </ul>
-                <div class="plate__foot">
-                  <ul class="taglist">
-                    <li>Laravel</li><li>MySQL</li><li>REST API</li><li>TripJack</li><li>Yatra</li><li>Easebuzz</li>
-                  </ul>
-                  <div class="plate__links">
-                    <a href="https://indikosh.in/" target="_blank" rel="noopener">indikosh.in <span class="arrow" aria-hidden="true">&#8599;</span></a>
-                  </div>
-                </div>
+              </div>
+              <div class="case__links">
+                <a href="https://indikosh.in/" target="_blank" rel="noopener">indikosh.in <span class="arrow" aria-hidden="true">&#8599;</span></a>
               </div>
             </div>
           </li>
 
           <!-- 03 Vendor & Workforce -->
-          <li class="plate" id="vendor" data-reveal>
-            <div class="plate__head">
-              <span class="plate__no" aria-hidden="true">03</span>
-              <div>
-                <h3 class="plate__title">Vendor &amp; Workforce Management</h3>
-                <p class="plate__type caption">Enterprise platform with AI querying &middot; Maxaix &middot; Internal</p>
+          <li class="case" id="vendor" data-tilt data-reveal>
+            <div class="case__media"><figure class="case__diagram diagram-panel" data-diagram="vendor"></figure></div>
+            <div class="case__body">
+              <header class="case__head">
+                <span class="case__no" aria-hidden="true">03</span>
+                <div>
+                  <h3 class="case__title">Vendor &amp; Workforce Management</h3>
+                  <p class="case__type caption">Enterprise platform with AI querying &middot; Maxaix &middot; Internal</p>
+                </div>
+              </header>
+              <p class="case__problem"><span class="caption">Problem</span>An enterprise platform running vendor and workforce operations end to end, with heavy month-end reporting and non-technical users who need data answers.</p>
+              <p class="case__challenge"><span class="caption">Technical challenge</span>I tuned exports of 100k+ timesheet records with chunked processing and background jobs, and added a Text-to-SQL agent (LLM + Qdrant) for permission-aware natural-language reporting.</p>
+              <div class="case__metrics">
+                <div class="metric"><span class="metric__num">100,000+</span><span class="metric__label caption">records exported</span></div>
+                <div class="metric"><span class="metric__num">Text-to-SQL</span><span class="metric__label caption">RAG agent</span></div>
+                <div class="metric"><span class="metric__num">60% &darr;</span><span class="metric__label caption">API cost</span></div>
               </div>
-            </div>
-            <div class="plate__grid">
-              <figure class="plate__diagram diagram-panel" data-diagram="vendor"></figure>
-              <div class="plate__text">
-                <p class="plate__desc">
-                  An enterprise platform that runs vendor and workforce operations end to end. I optimized
-                  month-end exports of 100k or more timesheet records with chunked processing and background
-                  jobs, and added a Text-to-SQL agent &mdash; backed by an LLM and a Qdrant vector store &mdash;
-                  so non-technical users can query data in plain English with permission-aware results.
-                </p>
-                <ul class="plate__points">
+              <ul class="taglist"><li>Laravel</li><li>MySQL</li><li>Claude API</li><li>Qdrant</li><li>Text-to-SQL</li><li>Queues</li></ul>
+              <button class="case__toggle" data-deepdive aria-expanded="false"><span>Technical deep dive</span><span class="case__toggle-ic" aria-hidden="true">+</span></button>
+              <div class="case__deepdive" hidden>
+                <ul class="case__points">
                   <li>Vendor, contract, and rate-structure management with effective dates</li>
                   <li>Multi-stage approval workflows and role-based access control</li>
                   <li>Large month-end exports tuned with chunking and background jobs</li>
                   <li>Text-to-SQL RAG agent for natural-language reporting</li>
                 </ul>
-                <div class="plate__foot">
-                  <ul class="taglist">
-                    <li>Laravel</li><li>MySQL</li><li>Claude API</li><li>Qdrant</li><li>Text-to-SQL</li><li>Queues</li>
-                  </ul>
-                  <div class="plate__links">
-                    <span class="plate__private caption">Internal enterprise system</span>
-                  </div>
-                </div>
+              </div>
+              <div class="case__links">
+                <span class="case__private">Internal enterprise system</span>
               </div>
             </div>
           </li>
 
           <!-- 04 RfqAI -->
-          <li class="plate plate--flip" id="rfqai" data-reveal>
-            <div class="plate__head">
-              <span class="plate__no" aria-hidden="true">04</span>
-              <div>
-                <h3 class="plate__title">RfqAI</h3>
-                <p class="plate__type caption">AI tender-estimation tool &middot; Maxaix &middot; Internal</p>
+          <li class="case" id="rfqai" data-tilt data-reveal>
+            <div class="case__media"><figure class="case__diagram diagram-panel" data-diagram="rfqai"></figure></div>
+            <div class="case__body">
+              <header class="case__head">
+                <span class="case__no" aria-hidden="true">04</span>
+                <div>
+                  <h3 class="case__title">RfqAI</h3>
+                  <p class="case__type caption">AI tender-estimation tool &middot; Maxaix &middot; Internal</p>
+                </div>
+              </header>
+              <p class="case__problem"><span class="caption">Problem</span>Turning a tender document into a priced procurement estimate used to take days of manual work.</p>
+              <p class="case__challenge"><span class="caption">Technical challenge</span>RfqAI chunks the document, uses an LLM to extract line items, prices them against a Qdrant vector store of past quotes plus live market rates, and exports a finished report.</p>
+              <div class="case__metrics">
+                <div class="metric"><span class="metric__num">Days &rarr; &lt;1hr</span><span class="metric__label caption">per estimate</span></div>
+                <div class="metric"><span class="metric__num">RAG +</span><span class="metric__label caption">vector store</span></div>
+                <div class="metric"><span class="metric__num">Auto</span><span class="metric__label caption">reports</span></div>
               </div>
-            </div>
-            <div class="plate__grid">
-              <figure class="plate__diagram diagram-panel" data-diagram="rfqai"></figure>
-              <div class="plate__text">
-                <p class="plate__desc">
-                  Turns a tender document into a procurement estimate in under an hour &mdash; work that used to
-                  take days. It chunks the document, uses an LLM to extract line items, then prices them against a
-                  Qdrant vector store of past quotes plus live market rates, and exports a finished report.
-                </p>
-                <ul class="plate__points">
+              <ul class="taglist"><li>Laravel</li><li>Claude API</li><li>Qdrant</li><li>RAG</li><li>Vector DB</li></ul>
+              <button class="case__toggle" data-deepdive aria-expanded="false"><span>Technical deep dive</span><span class="case__toggle-ic" aria-hidden="true">+</span></button>
+              <div class="case__deepdive" hidden>
+                <ul class="case__points">
                   <li>Document chunking and LLM line-item extraction</li>
                   <li>Pricing drawn from a vector store of historical quotes</li>
                   <li>Live market-rate lookups with source links</li>
                   <li>Template-driven procurement report generation</li>
                 </ul>
-                <div class="plate__foot">
-                  <ul class="taglist">
-                    <li>Laravel</li><li>Claude API</li><li>Qdrant</li><li>RAG</li><li>Vector DB</li>
-                  </ul>
-                  <div class="plate__links">
-                    <span class="plate__private caption">Internal enterprise tool</span>
-                  </div>
-                </div>
+              </div>
+              <div class="case__links">
+                <span class="case__private">Internal enterprise tool</span>
               </div>
             </div>
           </li>
 
           <!-- 05 MyRentalSpot -->
-          <li class="plate" id="myrentalspot" data-reveal>
-            <div class="plate__head">
-              <span class="plate__no" aria-hidden="true">05</span>
-              <div>
-                <h3 class="plate__title">MyRentalSpot</h3>
-                <p class="plate__type caption">Property-management SaaS &middot; Web Techno &middot; 2023</p>
+          <li class="case" id="myrentalspot" data-tilt data-reveal>
+            <div class="case__media"><figure class="case__diagram diagram-panel" data-diagram="myrentalspot"></figure></div>
+            <div class="case__body">
+              <header class="case__head">
+                <span class="case__no" aria-hidden="true">05</span>
+                <div>
+                  <h3 class="case__title">MyRentalSpot</h3>
+                  <p class="case__type caption">Property-management SaaS &middot; Web Techno &middot; 2023</p>
+                </div>
+              </header>
+              <p class="case__problem"><span class="caption">Problem</span>A property-management SaaS connecting landlords and renters, with rent collection that has to route across many bank accounts.</p>
+              <p class="case__challenge"><span class="caption">Technical challenge</span>I owned the entire payment system on Stripe Connect: multi-account routing, per-property rent, autopay, and recurring payments across every edge case, plus the renter flow and digital lease signing.</p>
+              <div class="case__metrics">
+                <div class="metric"><span class="metric__num">Multi-bank</span><span class="metric__label caption">Stripe routing</span></div>
+                <div class="metric"><span class="metric__num">Autopay</span><span class="metric__label caption">+ recurring</span></div>
+                <div class="metric"><span class="metric__num">Digital</span><span class="metric__label caption">lease signing</span></div>
               </div>
-            </div>
-            <div class="plate__grid">
-              <figure class="plate__diagram diagram-panel" data-diagram="myrentalspot"></figure>
-              <div class="plate__text">
-                <p class="plate__desc">
-                  A property-management SaaS connecting landlords and renters. I built the renter application flow,
-                  digital lease signing, and landlord management tools, then owned the entire payment system on
-                  Stripe Connect &mdash; multi-account routing, per-property rent, autopay, and recurring payments
-                  across every edge case.
-                </p>
-                <ul class="plate__points">
+              <ul class="taglist"><li>Laravel</li><li>Stripe Connect</li><li>MySQL</li><li>Blade</li><li>AWS Lightsail</li></ul>
+              <button class="case__toggle" data-deepdive aria-expanded="false"><span>Technical deep dive</span><span class="case__toggle-ic" aria-hidden="true">+</span></button>
+              <div class="case__deepdive" hidden>
+                <ul class="case__points">
                   <li>Renter application registration and digital lease signing</li>
                   <li>Landlord property listing and management tools</li>
                   <li>Full Stripe Connect payment system with multi-bank routing</li>
                   <li>Per-property rent routing, autopay, and recurring payments</li>
                 </ul>
-                <div class="plate__foot">
-                  <ul class="taglist">
-                    <li>Laravel</li><li>Stripe Connect</li><li>MySQL</li><li>Blade</li><li>AWS Lightsail</li>
-                  </ul>
-                  <div class="plate__links">
-                    <a href="https://www.myrentalspot.com/" target="_blank" rel="noopener">myrentalspot.com <span class="arrow" aria-hidden="true">&#8599;</span></a>
-                  </div>
-                </div>
+              </div>
+              <div class="case__links">
+                <a href="https://www.myrentalspot.com/" target="_blank" rel="noopener">myrentalspot.com <span class="arrow" aria-hidden="true">&#8599;</span></a>
               </div>
             </div>
           </li>
 
           <!-- 06 Jod Law Firm -->
-          <li class="plate plate--flip" id="jodlaw" data-reveal>
-            <div class="plate__head">
-              <span class="plate__no" aria-hidden="true">06</span>
-              <div>
-                <h3 class="plate__title">Jod Law Firm</h3>
-                <p class="plate__type caption">Trademark-services platform, CMS &middot; Freelance &middot; 2024</p>
+          <li class="case" id="jodlaw" data-tilt data-reveal>
+            <div class="case__media"><figure class="case__diagram diagram-panel" data-diagram="jodlaw"></figure></div>
+            <div class="case__body">
+              <header class="case__head">
+                <span class="case__no" aria-hidden="true">06</span>
+                <div>
+                  <h3 class="case__title">Jod Law Firm</h3>
+                  <p class="case__type caption">Trademark-services platform, CMS &middot; Freelance &middot; 2024</p>
+                </div>
+              </header>
+              <p class="case__problem"><span class="caption">Problem</span>A trademark-services firm needed a marketing site with a full content-management backend built for lead capture.</p>
+              <p class="case__challenge"><span class="caption">Technical challenge</span>I built a custom Laravel CMS for services, consultations, and inquiries with structured trademark sections, and deployed it on AWS EC2 with SSL and a CDN myself.</p>
+              <div class="case__metrics">
+                <div class="metric"><span class="metric__num">Custom</span><span class="metric__label caption">CMS</span></div>
+                <div class="metric"><span class="metric__num">AWS EC2</span><span class="metric__label caption">SSL + CDN</span></div>
+                <div class="metric"><span class="metric__num">Lead</span><span class="metric__label caption">capture</span></div>
               </div>
-            </div>
-            <div class="plate__grid">
-              <figure class="plate__diagram diagram-panel" data-diagram="jodlaw"></figure>
-              <div class="plate__text">
-                <p class="plate__desc">
-                  A trademark-services website with a full content-management backend. Built in Laravel, it lets
-                  the firm manage services, consultations, and inquiries, with structured trademark sections built
-                  to capture leads. I set it up on AWS EC2 with SSL and a CDN.
-                </p>
-                <ul class="plate__points">
+              <ul class="taglist"><li>Laravel</li><li>PHP</li><li>JavaScript</li><li>AWS EC2</li></ul>
+              <button class="case__toggle" data-deepdive aria-expanded="false"><span>Technical deep dive</span><span class="case__toggle-ic" aria-hidden="true">+</span></button>
+              <div class="case__deepdive" hidden>
+                <ul class="case__points">
                   <li>Custom CMS for services, consultations, and inquiries</li>
                   <li>Structured trademark sections built for lead capture</li>
                   <li>Laravel backend deployed on AWS EC2</li>
                   <li>Secure setup with SSL and CDN</li>
                 </ul>
-                <div class="plate__foot">
-                  <ul class="taglist">
-                    <li>Laravel</li><li>PHP</li><li>JavaScript</li><li>AWS EC2</li>
-                  </ul>
-                  <div class="plate__links">
-                    <a href="http://jodlawfirm.com/" target="_blank" rel="noopener">jodlawfirm.com <span class="arrow" aria-hidden="true">&#8599;</span></a>
-                  </div>
-                </div>
+              </div>
+              <div class="case__links">
+                <a href="http://jodlawfirm.com/" target="_blank" rel="noopener">jodlawfirm.com <span class="arrow" aria-hidden="true">&#8599;</span></a>
               </div>
             </div>
           </li>
@@ -350,100 +352,140 @@
     <section class="section caps" id="capabilities">
       <div class="shell">
         <header class="chapter" data-reveal>
-          <span class="chapter__mark" aria-hidden="true">&sect;02</span>
-          <h2 class="chapter__title">Capabilities</h2>
-          <p class="chapter__note">What I bring to a product, and the tools I reach for to build it.</p>
+          <span class="chapter__mark caption">&sect;02 - Capabilities</span>
+          <h2 class="chapter__title">Seven domains I build <em>in.</em></h2>
+          <p class="chapter__note">The engineering surfaces I work across, and the tools I reach for to ship them.</p>
         </header>
 
-        <dl class="ledger">
-          <div class="ledger__row" data-reveal>
-            <span class="ledger__icon" aria-hidden="true"></span>
-            <dt class="ledger__term">Backend and systems</dt>
-            <dd class="ledger__def">
-              <p>Laravel services, REST APIs, and the async layer that keeps them responsive: queues, jobs, and WebSocket events.</p>
-              <ul class="taglist"><li>Laravel</li><li>PHP</li><li>REST APIs</li><li>Queues and Jobs</li><li>WebSockets</li><li>Redis</li><li>PHPUnit</li></ul>
-            </dd>
-          </div>
+        <div class="caps__grid">
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">Backend Engineering</h3>
+            <p class="cap__desc">Laravel services and REST APIs with the async layer that keeps them responsive under load.</p>
+            <ul class="taglist"><li>Laravel</li><li>PHP</li><li>REST APIs</li><li>PHPUnit</li></ul>
+            <span class="cap__level caption">Production</span>
+          </article>
 
-          <div class="ledger__row" data-reveal>
-            <span class="ledger__icon" aria-hidden="true"></span>
-            <dt class="ledger__term">AI and machine learning</dt>
-            <dd class="ledger__def">
-              <p>LLM features that do real work: retrieval pipelines, Text-to-SQL, and AI-assisted flows wired into production apps.</p>
-              <ul class="taglist"><li>Claude API</li><li>Groq API</li><li>RAG Pipelines</li><li>Qdrant</li><li>Text-to-SQL</li><li>LLM Integration</li></ul>
-            </dd>
-          </div>
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">Distributed Systems</h3>
+            <p class="cap__desc">Real-time infrastructure: WebSocket events, Redis-backed state, and queue pipelines consistent at scale.</p>
+            <ul class="taglist"><li>Redis</li><li>WebSockets</li><li>Queues</li><li>Jobs</li></ul>
+            <span class="cap__level caption">Production</span>
+          </article>
 
-          <div class="ledger__row" data-reveal>
-            <span class="ledger__icon" aria-hidden="true"></span>
-            <dt class="ledger__term">Databases and performance</dt>
-            <dd class="ledger__def">
-              <p>Schema design and query tuning so systems stay fast as the data grows, including heavy exports and reporting.</p>
-              <ul class="taglist"><li>MySQL</li><li>Query Optimization</li><li>Schema Design</li><li>Indexing</li></ul>
-            </dd>
-          </div>
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">AI &amp; RAG</h3>
+            <p class="cap__desc">LLM features that do real work: retrieval pipelines, Text-to-SQL, and AI-assisted flows in production apps.</p>
+            <ul class="taglist"><li>Claude API</li><li>Qdrant</li><li>RAG</li><li>Text-to-SQL</li></ul>
+            <span class="cap__level caption">Production</span>
+          </article>
 
-          <div class="ledger__row" data-reveal>
-            <span class="ledger__icon" aria-hidden="true"></span>
-            <dt class="ledger__term">Payments and integrations</dt>
-            <dd class="ledger__def">
-              <p>Payment flows and third-party APIs wired in cleanly, from multi-account routing to supplier and gateway services.</p>
-              <ul class="taglist"><li>Stripe Connect</li><li>Easebuzz</li><li>TripJack</li><li>Yatra API</li></ul>
-            </dd>
-          </div>
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">Databases</h3>
+            <p class="cap__desc">Schema design and query tuning so systems stay fast as data grows, including heavy exports and reporting.</p>
+            <ul class="taglist"><li>MySQL</li><li>Indexing</li><li>Schema Design</li><li>Query Tuning</li></ul>
+            <span class="cap__level caption">Production</span>
+          </article>
 
-          <div class="ledger__row" data-reveal>
-            <span class="ledger__icon" aria-hidden="true"></span>
-            <dt class="ledger__term">Frontend</dt>
-            <dd class="ledger__def">
-              <p>Interfaces and admin panels that match the backend, built with React and server-rendered Blade views.</p>
-              <ul class="taglist"><li>React</li><li>JavaScript</li><li>HTML5</li><li>CSS3</li><li>Blade</li></ul>
-            </dd>
-          </div>
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">Cloud Infrastructure</h3>
+            <p class="cap__desc">Shipping and running apps on cloud servers, from provisioning to deployment and day-two operations.</p>
+            <ul class="taglist"><li>AWS EC2</li><li>Lightsail</li><li>Docker</li><li>Linux</li></ul>
+            <span class="cap__level caption">Daily driver</span>
+          </article>
 
-          <div class="ledger__row" data-reveal>
-            <span class="ledger__icon" aria-hidden="true"></span>
-            <dt class="ledger__term">Infrastructure and DevOps</dt>
-            <dd class="ledger__def">
-              <p>Shipping and running applications on cloud servers, from provisioning to deployment and day-two operations.</p>
-              <ul class="taglist"><li>AWS EC2</li><li>AWS Lightsail</li><li>Docker</li><li>Linux</li><li>Git</li><li>Apache</li></ul>
-            </dd>
-          </div>
-        </dl>
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">Payments</h3>
+            <p class="cap__desc">Payment flows and gateways wired in cleanly, from multi-account routing to supplier integrations.</p>
+            <ul class="taglist"><li>Stripe Connect</li><li>Easebuzz</li><li>Webhooks</li></ul>
+            <span class="cap__level caption">Production</span>
+          </article>
 
-        <p class="foundations" data-reveal>
-          <span class="caption">Foundations</span>
+          <article class="cap" data-reveal>
+            <span class="cap__icon" aria-hidden="true"></span>
+            <h3 class="cap__name">Performance Optimization</h3>
+            <p class="cap__desc">Profiling and tuning hot paths: chunked processing, caching, and cutting API and query cost.</p>
+            <ul class="taglist"><li>Caching</li><li>Chunking</li><li>Profiling</li></ul>
+            <span class="cap__level caption">Daily driver</span>
+          </article>
+        </div>
+
+        <p class="foundations caption" data-reveal>
+          <span class="foundations__cap">Foundations</span>
           System Design &middot; Async Architecture &middot; REST API Design &middot; Database Normalization
         </p>
       </div>
     </section>
 
-    <!-- ============ EXPERIENCE (deploy log) ============ -->
+    <!-- ============ AI & RAG ============ -->
+    <section class="section ai" id="ai">
+      <div class="shell">
+        <header class="chapter chapter--inv" data-reveal>
+          <span class="chapter__mark caption">&sect;03 - AI &amp; RAG</span>
+          <h2 class="chapter__title">Retrieval, reasoning, <em>shipped to prod.</em></h2>
+          <p class="chapter__note">Not demos. LLM systems wired into real enterprise workflows. Hover the flow to watch a question become an answer.</p>
+        </header>
+
+        <div class="ai__grid">
+          <figure class="ai__diagram diagram-panel diagram-panel--inv" data-diagram="rag" data-reveal></figure>
+          <div class="ai__tiles">
+            <article class="ai__tile" data-reveal>
+              <h3>Text-to-SQL Agent</h3>
+              <p>Plain-English questions become permission-aware SQL over enterprise data.</p>
+            </article>
+            <article class="ai__tile" data-reveal>
+              <h3>RAG Systems</h3>
+              <p>Retrieval pipelines that ground LLM output in real documents and quotes.</p>
+            </article>
+            <article class="ai__tile" data-reveal>
+              <h3>Qdrant Vector Search</h3>
+              <p>A vector store powering semantic lookups across past quotes and schemas.</p>
+            </article>
+            <article class="ai__tile" data-reveal>
+              <h3>Claude / OpenAI</h3>
+              <p>LLMs wired into production flows with structured, reliable output.</p>
+            </article>
+            <article class="ai__tile" data-reveal>
+              <h3>LLM Workflows</h3>
+              <p>Chunk &rarr; extract &rarr; price &rarr; report pipelines that replace days of manual work.</p>
+            </article>
+            <article class="ai__tile" data-reveal>
+              <h3>AI Agents</h3>
+              <p>Task-driven agents that query, reason over, and act on business data.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
     <section class="section record" id="experience">
       <div class="shell">
         <header class="chapter" data-reveal>
-          <span class="chapter__mark" aria-hidden="true">&sect;03</span>
-          <h2 class="chapter__title">Experience</h2>
-          <p class="chapter__note">A shipping record &mdash; three roles since December 2022, and the systems each one put into production.</p>
+          <span class="chapter__mark caption">&sect;04 - Experience</span>
+          <h2 class="chapter__title">A shipping <em>record.</em></h2>
+          <p class="chapter__note">Three roles since December 2022, and the systems each one put into production.</p>
         </header>
 
-        <ol class="deploys">
-          <li class="deploy is-active" data-reveal>
-            <div class="deploy__meta">
-              <span class="deploy__tag caption">Mar 2024 &ndash; Present</span>
-              <span class="deploy__status"><span class="dot" aria-hidden="true"></span>Active &middot; Jodhpur</span>
+        <ol class="tl">
+          <li class="tl__item is-active" data-reveal>
+            <span class="tl__dot" aria-hidden="true"></span>
+            <div class="tl__meta">
+              <span class="tl__date caption">Mar 2024 &ndash; Present</span>
+              <span class="tl__status"><span class="dot" aria-hidden="true"></span>Active &middot; Jodhpur</span>
             </div>
-            <div class="deploy__body">
-              <h3 class="deploy__role">Software Developer <span class="deploy__org">&mdash; <a href="https://maxaix.com" target="_blank" rel="noopener">Maxaix</a></span></h3>
-              <p class="deploy__summary">
-                I work across the backend of several production products and own features from the database to
-                deployment: real-time infrastructure for live tracking and dispatch, LLMs and retrieval pipelines
-                in enterprise workflows, payment gateways and supplier APIs, and the query and export tuning that
-                keeps it all reliable under real load.
-              </p>
-              <div class="deploy__shipped">
+            <div class="tl__body">
+              <h3 class="tl__role">Software Developer <span class="tl__org">- <a href="https://maxaix.com" target="_blank" rel="noopener">Maxaix</a></span></h3>
+              <p class="tl__summary">Own features end to end across several production products: real-time tracking and dispatch, LLM and retrieval pipelines in enterprise workflows, payment gateways and supplier APIs, and the query and export tuning that keeps it reliable under real load.</p>
+              <ul class="taglist"><li>Laravel</li><li>Redis</li><li>WebSockets</li><li>Claude API</li><li>Qdrant</li><li>MySQL</li></ul>
+              <div class="tl__shipped">
                 <span class="caption">Shipped</span>
-                <ul class="deploy__manifest">
+                <ul class="tl__manifest">
                   <li><a href="#sendmepls">SendMePls</a></li>
                   <li><a href="#indikosh">Indikosh</a></li>
                   <li><a href="#vendor">Vendor &amp; Workforce</a></li>
@@ -453,46 +495,36 @@
             </div>
           </li>
 
-          <li class="deploy" data-reveal>
-            <div class="deploy__meta">
-              <span class="deploy__tag caption">Dec 2023 &ndash; Mar 2024</span>
-              <span class="deploy__status"><span class="dot" aria-hidden="true"></span>Shipped &middot; Remote</span>
+          <li class="tl__item" data-reveal>
+            <span class="tl__dot" aria-hidden="true"></span>
+            <div class="tl__meta">
+              <span class="tl__date caption">Dec 2023 &ndash; Mar 2024</span>
+              <span class="tl__status"><span class="dot" aria-hidden="true"></span>Shipped &middot; Remote</span>
             </div>
-            <div class="deploy__body">
-              <h3 class="deploy__role">Full-Stack Developer <span class="deploy__org">&mdash; Freelance</span></h3>
-              <p class="deploy__summary">
-                I took on a full client project on my own and owned every layer of it. For Jod Law Firm I designed
-                the Laravel backend and a content-management panel the firm uses to run its services,
-                consultations, and inquiries, built the trademark sections to capture leads, and handled the AWS
-                deployment with SSL and a CDN myself.
-              </p>
-              <div class="deploy__shipped">
+            <div class="tl__body">
+              <h3 class="tl__role">Full-Stack Developer <span class="tl__org">- Freelance</span></h3>
+              <p class="tl__summary">Took a full client project solo and owned every layer: designed the Laravel backend and the CMS Jod Law Firm runs its services and inquiries on, built the trademark sections for lead capture, and handled the AWS deployment with SSL and a CDN myself.</p>
+              <ul class="taglist"><li>Laravel</li><li>PHP</li><li>JavaScript</li><li>AWS EC2</li></ul>
+              <div class="tl__shipped">
                 <span class="caption">Shipped</span>
-                <ul class="deploy__manifest">
-                  <li><a href="#jodlaw">Jod Law Firm</a></li>
-                </ul>
+                <ul class="tl__manifest"><li><a href="#jodlaw">Jod Law Firm</a></li></ul>
               </div>
             </div>
           </li>
 
-          <li class="deploy" data-reveal>
-            <div class="deploy__meta">
-              <span class="deploy__tag caption">Dec 2022 &ndash; Sep 2023</span>
-              <span class="deploy__status"><span class="dot" aria-hidden="true"></span>Shipped &middot; Jodhpur</span>
+          <li class="tl__item" data-reveal>
+            <span class="tl__dot" aria-hidden="true"></span>
+            <div class="tl__meta">
+              <span class="tl__date caption">Dec 2022 &ndash; Sep 2023</span>
+              <span class="tl__status"><span class="dot" aria-hidden="true"></span>Shipped &middot; Jodhpur</span>
             </div>
-            <div class="deploy__body">
-              <h3 class="deploy__role">Junior Web Developer <span class="deploy__org">&mdash; <a href="https://www.webtechnosoftwares.com/" target="_blank" rel="noopener">Web Techno Software</a></span></h3>
-              <p class="deploy__summary">
-                This is where I learned to ship. I picked up PHP, Laravel, Git, and deployment on real projects and
-                grew from fixing bugs to owning features. On MyRentalSpot I built the renter flow, lease signing,
-                and property management, then the full Stripe Connect payment system, and maintained a
-                transport-company CRM, speeding up slow queries on existing modules.
-              </p>
-              <div class="deploy__shipped">
+            <div class="tl__body">
+              <h3 class="tl__role">Junior Web Developer <span class="tl__org">- <a href="https://www.webtechnosoftwares.com/" target="_blank" rel="noopener">Web Techno Software</a></span></h3>
+              <p class="tl__summary">Where I learned to ship. Grew from fixing bugs to owning features. Built MyRentalSpot's renter flow, lease signing, and property management, then the full Stripe Connect payment system, and sped up slow queries on a transport-company CRM.</p>
+              <ul class="taglist"><li>PHP</li><li>Laravel</li><li>Stripe Connect</li><li>MySQL</li><li>Git</li></ul>
+              <div class="tl__shipped">
                 <span class="caption">Shipped</span>
-                <ul class="deploy__manifest">
-                  <li><a href="#myrentalspot">MyRentalSpot</a></li>
-                </ul>
+                <ul class="tl__manifest"><li><a href="#myrentalspot">MyRentalSpot</a></li></ul>
               </div>
             </div>
           </li>
@@ -516,14 +548,56 @@
       </div>
     </section>
 
+    <!-- ============ TECH STACK ============ -->
+    <section class="section stack" id="stack">
+      <div class="shell">
+        <header class="chapter" data-reveal>
+          <span class="chapter__mark caption">&sect;05 - Tech Stack</span>
+          <h2 class="chapter__title">The tools, <em>by domain.</em></h2>
+          <p class="chapter__note">What I reach for day to day. Filter by where it lives in the stack.</p>
+        </header>
+
+        <div class="stack__filters" role="group" aria-label="Filter technologies by category" data-reveal>
+          <button class="stack__pill is-on" data-filter="all">All</button>
+          <button class="stack__pill" data-filter="backend">Backend</button>
+          <button class="stack__pill" data-filter="data">Data</button>
+          <button class="stack__pill" data-filter="ai">AI</button>
+          <button class="stack__pill" data-filter="cloud">Cloud</button>
+          <button class="stack__pill" data-filter="frontend">Frontend</button>
+        </div>
+
+        <ul class="stack__grid" data-reveal>
+          <li class="tech" data-cat="backend">Laravel</li>
+          <li class="tech" data-cat="backend">PHP</li>
+          <li class="tech" data-cat="backend">REST APIs</li>
+          <li class="tech" data-cat="backend">WebSockets</li>
+          <li class="tech" data-cat="backend">Stripe Connect</li>
+          <li class="tech" data-cat="backend data">Redis</li>
+          <li class="tech" data-cat="data">MySQL</li>
+          <li class="tech" data-cat="data ai">Qdrant</li>
+          <li class="tech" data-cat="backend ai">Python</li>
+          <li class="tech" data-cat="ai">Claude API</li>
+          <li class="tech" data-cat="ai">OpenAI</li>
+          <li class="tech" data-cat="ai">RAG</li>
+          <li class="tech" data-cat="cloud">AWS</li>
+          <li class="tech" data-cat="cloud">Docker</li>
+          <li class="tech" data-cat="cloud">Linux</li>
+          <li class="tech" data-cat="cloud">Git</li>
+          <li class="tech" data-cat="frontend">JavaScript</li>
+          <li class="tech" data-cat="frontend">React</li>
+          <li class="tech" data-cat="frontend">Tailwind</li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ============ CONTACT ============ -->
     <section class="section sign" id="contact">
       <div class="shell sign__grid">
         <div class="sign__lead" data-reveal>
-          <span class="chapter__mark" aria-hidden="true">&sect;04</span>
+          <span class="chapter__mark caption">&sect;06 - Contact</span>
           <h2 class="sign__title">Let's build something <em>solid.</em></h2>
           <p class="sign__sub">Email is the fastest way to reach me. I read everything that comes in.</p>
-          <a class="sign__email" href="mailto:ojhashivam7414@gmail.com">
+          <a class="sign__email" href="mailto:ojhashivam7414@gmail.com" data-magnetic>
             <span>ojhashivam7414@gmail.com</span>
             <span class="arrow" aria-hidden="true">&#8594;</span>
           </a>
@@ -563,12 +637,13 @@
     <div class="shell footer__inner">
       <span class="footer__name">Shivam Kumar</span>
       <span class="footer__meta caption">&copy; <span id="year">2026</span> &middot; Hand-coded, no build step</span>
-      <a class="footer__top" href="#top">Back to top <span class="arrow" aria-hidden="true">&#8593;</span></a>
+      <a class="footer__top" href="#top" data-magnetic>Back to top <span class="arrow" aria-hidden="true">&#8593;</span></a>
     </div>
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=3"></script>
+  <!-- Three.js is dynamically imported (ESM) inside script.js only when the hero animates. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="script.js?v=4"></script>
 </body>
 </html>
