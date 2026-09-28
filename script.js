@@ -1,641 +1,995 @@
-/* =====================================================================
-   Shivam Kumar - "Production Grade"
-   Hand-coded, no build step. One IIFE.
+/* ==========================================================================
+   Shivam Kumar · portfolio
+   GSAP + ScrollTrigger, native scroll, no build step.
+   ========================================================================== */
+(() => {
+  'use strict';
 
-   Checkpoint A: core utilities, hero headline reveal, Three.js hero
-   scene (node-graph + particle field) with full fallbacks, cursor glow,
-   magnetic actions, header/menu/anchor/nav-spy. Later checkpoints add the
-   SVG diagram engine and the remaining section interactions.
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const mouse = { x: -9999, y: -9999, active: false };
 
-   No-JS safe · reduced-motion safe · feature-detected throughout.
-   ===================================================================== */
-(function () {
-  "use strict";
+  window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; }, { passive: true });
+  document.addEventListener('mouseleave', () => { mouse.active = false; });
 
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fine   = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var hasGSAP = typeof window.gsap !== "undefined";
-  var hasST   = hasGSAP && typeof window.ScrollTrigger !== "undefined";
-  var NS = "http://www.w3.org/2000/svg";
+  if (!window.gsap || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
+  if (window.SplitText) gsap.registerPlugin(SplitText);
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
-  if (hasST) gsap.registerPlugin(ScrollTrigger);
-
-  function svgEl(tag, attrs) {
-    var e = document.createElementNS(NS, tag);
-    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
-    return e;
+  /* ------------------------------------------------------------- 2D noise */
+  const perm = new Uint8Array(512);
+  {
+    const p = [...Array(256).keys()];
+    for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; }
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+  }
+  const fade = (t) => t * t * t * (t * (t * 6 - 15) + 10);
+  const grad = (h, x, y) => ((h & 1) ? -x : x) + ((h & 2) ? -y : y);
+  function noise(x, y) {
+    const xi = Math.floor(x), yi = Math.floor(y);
+    const X = xi & 255, Y = yi & 255;
+    x -= xi; y -= yi;
+    const u = fade(x), v = fade(y);
+    const a = perm[X] + Y, b = perm[X + 1] + Y;
+    return lerp(
+      lerp(grad(perm[a], x, y), grad(perm[b], x - 1, y), u),
+      lerp(grad(perm[a + 1], x, y - 1), grad(perm[b + 1], x - 1, y - 1), u),
+      v
+    );
   }
 
-  /* =====================================================================
-     HERO HEADLINE - split into words for the line-rise reveal
-     ===================================================================== */
-  (function splitTitle() {
-    var h1 = document.querySelector(".hero__title");
-    if (!h1) return;
-    var frag = document.createDocumentFragment();
-    function emit(text, accent) {
-      text.split(/(\s+)/).forEach(function (tok) {
-        if (tok === "") return;
-        if (/^\s+$/.test(tok)) { frag.appendChild(document.createTextNode(" ")); return; }
-        var w = document.createElement("span");
-        w.className = "word" + (accent ? " word--accent" : "");
-        var inner = document.createElement("span");
-        inner.className = "word__in"; inner.textContent = tok;
-        if (accent) { inner.style.fontFamily = "var(--font-serif)"; inner.style.fontStyle = "italic"; inner.style.color = "var(--accent-2)"; }
-        w.appendChild(inner); frag.appendChild(w);
-      });
+  /* ------------------------------------------------------ signal field */
+  // A ridgeline plot drawn back to front: each line fills beneath itself so
+  // nearer ridges hide the ones behind. The cursor raises a swell in it.
+  class Field {
+    constructor(canvas, opts) {
+      this.c = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.o = Object.assign({ lines: 44, top: 0.3, bottom: 1.02, peak: 7, step: 7, calm: false, bg: '#0b0b0e', fg: '242,242,244', acc: '#d4ff3a' }, opts);
+      this.t = Math.random() * 50;
+      this.mx = -9999; this.my = -9999;
+      this.intro = 0; this.flat = 0;
+      this.running = false;
+      this.resize();
+      new ResizeObserver(() => this.resize()).observe(canvas);
+      new IntersectionObserver(([e]) => { e.isIntersecting ? this.start() : this.stop(); }, { rootMargin: '80px' }).observe(canvas);
     }
-    Array.prototype.slice.call(h1.childNodes).forEach(function (node) {
-      if (node.nodeType === 3) emit(node.textContent, false);
-      else if (node.nodeName === "EM") emit(node.textContent, true);
-    });
-    h1.textContent = "";
-    h1.appendChild(frag);
-  })();
-
-  /* =====================================================================
-     THREE.JS HERO - node graph + particle field, mouse-reactive
-     Boots only when safe; otherwise the CSS/SVG fallback stays visible.
-     ===================================================================== */
-  function webglOK() {
-    try {
-      var c = document.createElement("canvas");
-      return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl")));
-    } catch (e) { return false; }
-  }
-
-  function bootHero(THREE, canvas, hero) {
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(58, 1, 0.1, 400);
-    camera.position.z = 64;
-
-    function size() {
-      var w = hero.clientWidth, h = hero.clientHeight;
-      camera.aspect = w / Math.max(1, h);
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
+    resize() {
+      const r = this.c.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.w = r.width; this.h = r.height;
+      this.c.width = Math.round(r.width * dpr);
+      this.c.height = Math.round(r.height * dpr);
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.o.lines = this.w < 700 ? Math.round(this.o.baseLines * .62) : this.o.baseLines;
+      this.draw();
     }
-
-    /* round, soft point sprite */
-    function dotTexture() {
-      var c = document.createElement("canvas"); c.width = c.height = 64;
-      var x = c.getContext("2d");
-      var g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-      g.addColorStop(0, "rgba(255,255,255,1)");
-      g.addColorStop(0.3, "rgba(180,196,255,0.95)");
-      g.addColorStop(1, "rgba(140,160,255,0)");
-      x.fillStyle = g; x.fillRect(0, 0, 64, 64);
-      return new THREE.CanvasTexture(c);
+    start() {
+      if (this.running || reduce) return;
+      this.running = true;
+      let last = performance.now();
+      const loop = (now) => {
+        if (!this.running) return;
+        this.t += Math.min(now - last, 50) / 1000;
+        last = now;
+        this.follow();
+        this.draw();
+        this.raf = requestAnimationFrame(loop);
+      };
+      this.raf = requestAnimationFrame(loop);
     }
-    var dot = dotTexture();
-
-    var COUNT = window.innerWidth < 768 ? 60 : 120;
-    var SPREAD_X = 62, SPREAD_Y = 36, SPREAD_Z = 26;
-
-    /* ----- nodes ----- */
-    var nodePos = new Float32Array(COUNT * 3);
-    var pts = [];
-    for (var i = 0; i < COUNT; i++) {
-      var x = (Math.random() * 2 - 1) * SPREAD_X;
-      var y = (Math.random() * 2 - 1) * SPREAD_Y;
-      var z = (Math.random() * 2 - 1) * SPREAD_Z;
-      nodePos[i * 3] = x; nodePos[i * 3 + 1] = y; nodePos[i * 3 + 2] = z;
-      pts.push([x, y, z]);
+    stop() { this.running = false; cancelAnimationFrame(this.raf); }
+    follow() {
+      const r = this.c.getBoundingClientRect();
+      let tx, ty;
+      if (fine && mouse.active) { tx = mouse.x - r.left; ty = mouse.y - r.top; }
+      else { tx = this.w * (0.5 + 0.34 * Math.sin(this.t * 0.37)); ty = this.h * (this.o.top + 0.3 + 0.18 * Math.sin(this.t * 0.61)); }
+      if (this.mx < -9000) { this.mx = tx; this.my = ty; }
+      this.mx = lerp(this.mx, tx, 0.09);
+      this.my = lerp(this.my, ty, 0.09);
     }
-    var nodeGeo = new THREE.BufferGeometry();
-    nodeGeo.setAttribute("position", new THREE.BufferAttribute(nodePos, 3));
-    var nodeMat = new THREE.PointsMaterial({
-      size: 2.4, map: dot, color: 0xBFCAFF, transparent: true, opacity: 0.95,
-      sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending
-    });
-    var nodes = new THREE.Points(nodeGeo, nodeMat);
+    draw() {
+      const { ctx, w, h, o } = this;
+      if (!w) return;
+      ctx.clearRect(0, 0, w, h);
+      const n = o.lines;
+      const y0 = h * o.top, y1 = h * o.bottom;
+      const gap = (y1 - y0) / (n - 1);
+      const k = (1 - this.intro) * (1 - this.flat);
+      const t = this.t;
+      const sigma = Math.max(70, w * 0.07);
+      const pulseX = ((t * 0.16) % 1.4 - 0.2) * w;
+      const pulseLine = Math.floor(t * 0.16 / 1.4 * 7) % n;
+      let hot = -1, hotDist = 1e9;
+      for (let i = 0; i < n; i++) { const d = Math.abs(y0 + i * gap - this.my); if (d < hotDist) { hotDist = d; hot = i; } }
+      if (hotDist > gap * 3) hot = -1;
 
-    /* ----- edges (computed once: nearest, capped per node) ----- */
-    var TH = 22, MAX_PER = 3, segs = [];
-    for (var a = 0; a < COUNT; a++) {
-      var conn = 0;
-      for (var b = a + 1; b < COUNT && conn < MAX_PER; b++) {
-        var dx = pts[a][0] - pts[b][0], dy = pts[a][1] - pts[b][1], dz = pts[a][2] - pts[b][2];
-        if (Math.sqrt(dx * dx + dy * dy + dz * dz) < TH) {
-          segs.push(pts[a][0], pts[a][1], pts[a][2], pts[b][0], pts[b][1], pts[b][2]);
-          conn++;
+      for (let i = 0; i < n; i++) {
+        const by = y0 + i * gap;
+        const line = new Path2D();
+        const drift = 0.5 + 0.1 * Math.sin(i * 0.9 + t * 0.2);
+        for (let x = -o.step; x <= w + o.step; x += o.step) {
+          const nx = x / w;
+          let hgt;
+          if (o.calm) {
+            hgt = (noise(x * 0.01 + i * 3.1, t * 0.25 + i) * 0.5 + 0.5) * gap * 0.45;
+            if (i === pulseLine) hgt += Math.exp(-((x - pulseX) ** 2) / (2 * 38 * 38)) * gap * 5.5;
+          } else {
+            const env = Math.exp(-(((nx - drift) / 0.22) ** 2));
+            const a = noise(x * 0.0058 + i * 1.7, t * 0.16 + i * 0.13) * 0.5 + 0.5;
+            const b = noise(x * 0.022 - i * 0.9, t * 0.33 + i * 0.05) * 0.5 + 0.5;
+            hgt = (a ** 2.4) * env * gap * o.peak + b * gap * 0.42 * (0.35 + env);
+          }
+          const dx = x - this.mx, dy = by - this.my;
+          hgt += Math.exp(-(dx * dx) / (2 * sigma * sigma) - (dy * dy) / (2 * 80 * 80)) * gap * (o.calm ? 3.2 : 4.6);
+          const y = by - hgt * k;
+          x === -o.step ? line.moveTo(x, y) : line.lineTo(x, y);
         }
+        const fill = new Path2D(line);
+        fill.lineTo(w + o.step, h + 2);
+        fill.lineTo(-o.step, h + 2);
+        fill.closePath();
+        ctx.fillStyle = o.bg;
+        ctx.fill(fill);
+        const depth = i / (n - 1);
+        if (i === hot) { ctx.strokeStyle = o.acc; ctx.lineWidth = 1.6; }
+        else { ctx.strokeStyle = `rgba(${o.fg},${0.16 + depth * 0.5})`; ctx.lineWidth = 1; }
+        ctx.stroke(line);
       }
     }
-    var edgeGeo = new THREE.BufferGeometry();
-    edgeGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(segs), 3));
-    var edgeMat = new THREE.LineBasicMaterial({ color: 0x1F3BFF, transparent: true, opacity: 0.20, depthWrite: false, blending: THREE.AdditiveBlending });
-    var edges = new THREE.LineSegments(edgeGeo, edgeMat);
+  }
 
-    var graph = new THREE.Group();
-    graph.add(edges); graph.add(nodes);
-    scene.add(graph);
+  // If a pinned panel's content is taller than the screen, zoom it down to fit.
+  function fitPanel(el) {
+    const fit = () => {
+      el.style.zoom = '';
+      const need = el.scrollHeight;
+      if (need > innerHeight + 1) el.style.zoom = (innerHeight / need).toFixed(4);
+    };
+    fit();
+    ScrollTrigger.addEventListener('refreshInit', fit);
+  }
 
-    /* ----- particle field (depth layer) ----- */
-    var PCOUNT = COUNT * 4;
-    var pPos = new Float32Array(PCOUNT * 3);
-    for (var p = 0; p < PCOUNT; p++) {
-      pPos[p * 3] = (Math.random() * 2 - 1) * 110;
-      pPos[p * 3 + 1] = (Math.random() * 2 - 1) * 70;
-      pPos[p * 3 + 2] = (Math.random() * 2 - 1) * 70 - 40;
-    }
-    var fieldGeo = new THREE.BufferGeometry();
-    fieldGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
-    var fieldMat = new THREE.PointsMaterial({ size: 1.0, map: dot, color: 0x5B79FF, transparent: true, opacity: 0.5, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending });
-    var field = new THREE.Points(fieldGeo, fieldMat);
-    scene.add(field);
+  /* --------------------------------------------------------------- theme */
+  const THEMES = {
+    ink: { '--bg': '#0b0b0e', '--fg': '#f2f2f4', '--acc': '#d4ff3a' },
+    fincard: { '--bg': '#4a2fe0', '--fg': '#ffffff', '--acc': '#d4ff3a' },
+    sendme: { '--bg': '#0e3b2f', '--fg': '#eafff5', '--acc': '#5cf2c8' },
+    indikosh: { '--bg': '#dbe6ff', '--fg': '#0b1530', '--acc': '#1f5cff' },
+    vendor: { '--bg': '#17181c', '--fg': '#f1f1f3', '--acc': '#ffb020' },
+    rfq: { '--bg': '#101c52', '--fg': '#eef3ff', '--acc': '#7fe3ff' },
+    rental: { '--bg': '#f6dde3', '--fg': '#1b0b12', '--acc': '#d6246e' },
+    jod: { '--bg': '#3a0d18', '--fg': '#fbeff1', '--acc': '#e8c06a' },
+    paper: { '--bg': '#ececee', '--fg': '#0b0b0e', '--acc': '#4a2fe0' },
+    volt: { '--bg': '#d4ff3a', '--fg': '#0b0b0e', '--acc': '#0b0b0e' },
+  };
+  const metaTheme = $('meta[name="theme-color"]');
+  let theme = 'ink';
+  function setTheme(name, instant) {
+    if (!THEMES[name] || name === theme) return;
+    theme = name;
+    gsap.to(root, { ...THEMES[name], duration: instant || reduce ? 0 : 0.75, ease: 'power2.out', overwrite: 'auto' });
+    metaTheme.setAttribute('content', THEMES[name]['--bg']);
+  }
 
-    /* ----- interaction + loop ----- */
-    var pointerX = 0, pointerY = 0, tpx = 0, tpy = 0, spin = 0, active = true, running = false;
-    window.addEventListener("pointermove", function (e) {
-      tpx = (e.clientX / window.innerWidth) * 2 - 1;
-      tpy = (e.clientY / window.innerHeight) * 2 - 1;
+  /* ------------------------------------------------------ chapter label */
+  const chNo = $('.nav__chapter-no');
+  const chName = $('.nav__chapter-name');
+  let chapter = '00|Home';
+  function setChapter(value) {
+    if (value === chapter) return;
+    chapter = value;
+    const [no, name] = value.split('|');
+    chNo.textContent = no;
+    const old = chName.firstElementChild;
+    const next = document.createElement('span');
+    next.textContent = name;
+    chName.appendChild(next);
+    if (reduce) { old.remove(); return; }
+    gsap.fromTo(next, { yPercent: 0 }, { yPercent: -100, duration: 0.5, ease: 'power3.inOut' });
+    gsap.to(old, { yPercent: -100, duration: 0.5, ease: 'power3.inOut', onComplete: () => { old.remove(); gsap.set(next, { yPercent: 0 }); } });
+  }
+
+  /* -------------------------------------------------------------- cursor */
+  function initCursor() {
+    if (!fine || reduce) return;
+    root.classList.add('has-cursor');
+    const cur = $('.cursor');
+    const label = $('.cursor__label');
+    const dx = gsap.quickTo('.cursor__dot', 'x', { duration: 0.08 });
+    const dy = gsap.quickTo('.cursor__dot', 'y', { duration: 0.08 });
+    const rx = gsap.quickTo('.cursor__ring', 'x', { duration: 0.45, ease: 'power3' });
+    const ry = gsap.quickTo('.cursor__ring', 'y', { duration: 0.45, ease: 'power3' });
+    window.addEventListener('mousemove', (e) => { cur.classList.add('is-live'); dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); }, { passive: true });
+    document.addEventListener('mouseleave', () => cur.classList.remove('is-live'));
+    document.addEventListener('mouseover', (e) => {
+      const t = e.target.closest('a, button, [data-cursor]');
+      if (!t) return;
+      label.textContent = t.dataset.cursor || '';
+      cur.classList.toggle('is-hover', !!t.dataset.cursor);
+      cur.classList.toggle('is-link', !t.dataset.cursor);
     });
-
-    function frame() {
-      if (!active || document.hidden) { running = false; return; }
-      running = true;
-      pointerX += (tpx - pointerX) * 0.04;
-      pointerY += (tpy - pointerY) * 0.04;
-      spin += 0.0006;
-      graph.rotation.y = spin + pointerX * 0.5;
-      graph.rotation.x = pointerY * 0.28;
-      field.rotation.y = -spin * 0.4;
-      field.rotation.x = pointerY * 0.12;
-      camera.position.x += (pointerX * 6 - camera.position.x) * 0.04;
-      camera.position.y += (-pointerY * 4 - camera.position.y) * 0.04;
-      camera.lookAt(0, 0, 0);
-      renderer.render(scene, camera);
-      requestAnimationFrame(frame);
-    }
-    function start() { if (!running) requestAnimationFrame(frame); }
-
-    var rt;
-    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(size, 150); }, { passive: true });
-    document.addEventListener("visibilitychange", function () { if (!document.hidden) start(); });
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (es) {
-        es.forEach(function (e) { active = e.isIntersecting; if (active) start(); });
-      }, { threshold: 0.01 }).observe(hero);
-    }
-
-    size();
-    document.body.classList.add("webgl-on");
-    start();
+    document.addEventListener('mouseout', (e) => {
+      const t = e.target.closest('a, button, [data-cursor]');
+      if (t && !t.contains(e.relatedTarget)) cur.classList.remove('is-hover', 'is-link');
+    });
   }
 
-  /* Load Three.js (ESM) on demand - only when we actually intend to animate the hero. */
-  (function loadHero() {
-    var canvas = document.getElementById("heroCanvas");
-    var hero = document.getElementById("hero");
-    if (!canvas || !hero || reduce || !webglOK()) return;
-    if (!fine && window.innerWidth < 768) return; // skip heavy WebGL on small touch screens
-    import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js")
-      .then(function (T) { bootHero(T, canvas, hero); })
-      .catch(function () { /* import failed - CSS/SVG fallback stays visible */ });
-  })();
+  /* ---------------------------------------------------------------- hero */
+  let heroField;
+  function initHero() {
+    heroField = new Field($('.hero__field'), { baseLines: 46, top: 0.34, bottom: 1.04, peak: 7.5 });
+    heroField.intro = 1;
 
-  /* =====================================================================
-     HERO LOAD TIMELINE
-     ===================================================================== */
-  if (hasGSAP && !reduce) {
-    gsap.set([".hero__kicker", ".hero__standfirst", ".hero__actions", ".hero__cue"], { opacity: 0, y: 24 });
-    gsap.set(".hero__title .word__in", { yPercent: 118 });
-    var tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.15 });
-    tl.to(".hero__kicker", { opacity: 1, y: 0, duration: 0.7 })
-      .to(".hero__title .word__in", { yPercent: 0, duration: 0.9, stagger: 0.045 }, "-=0.35")
-      .to([".hero__standfirst", ".hero__actions"], { opacity: 1, y: 0, duration: 0.8, stagger: 0.12 }, "-=0.5")
-      .to(".hero__cue", { opacity: 1, y: 0, duration: 0.6 }, "-=0.4");
-  }
-
-  /* =====================================================================
-     CURSOR GLOW (desktop fine-pointer only)
-     ===================================================================== */
-  if (fine && !reduce) {
-    var glow = document.querySelector(".cursor-glow");
-    if (glow) {
-      var gx = window.innerWidth / 2, gy = window.innerHeight / 2, gtx = gx, gty = gy, gshown = false;
-      window.addEventListener("pointermove", function (e) {
-        gtx = e.clientX; gty = e.clientY;
-        if (!gshown) { gshown = true; document.body.classList.add("cursor-on"); }
+    const letters = [];
+    $$('.hero__line').forEach((line) => {
+      const text = line.textContent;
+      line.textContent = '';
+      [...text].forEach((c) => {
+        const mask = document.createElement('span');
+        mask.className = 'ch-mask';
+        const ch = document.createElement('span');
+        ch.className = 'ch';
+        ch.textContent = c;
+        mask.appendChild(ch);
+        line.appendChild(mask);
+        letters.push({ el: ch, wd: 100, wg: 800 });
       });
-      (function gloop() {
-        gx += (gtx - gx) * 0.15; gy += (gty - gy) * 0.15;
-        glow.style.transform = "translate(" + gx.toFixed(1) + "px," + gy.toFixed(1) + "px)";
-        requestAnimationFrame(gloop);
-      })();
+    });
+    const els = letters.map((l) => l.el);
+    const apply = (l) => { l.el.style.fontVariationSettings = `"wdth" ${l.wd.toFixed(1)}, "wght" ${l.wg.toFixed(0)}`; };
+
+    let live = false;
+    if (reduce) {
+      heroField.intro = 0;
+      heroField.draw();
+      live = false;
+    } else {
+      letters.forEach((l) => { l.wd = 62; l.wg = 200; apply(l); });
+      gsap.set(els, { yPercent: 108 });
+      const tl = gsap.timeline({ delay: 0.2 });
+      tl.to(els, { yPercent: 0, duration: 1.2, ease: 'expo.out', stagger: 0.045 })
+        .to(letters, { wd: 100, wg: 800, duration: 1.5, ease: 'expo.inOut', stagger: 0.045, onUpdate() { this.targets().forEach(apply); } }, 0.25)
+        .to(heroField, { intro: 0, duration: 2.4, ease: 'expo.out' }, 0.1)
+        .from('.hero__top, .hero__foot', { autoAlpha: 0, y: 24, duration: 0.9, ease: 'power3.out', stagger: 0.12 }, 0.8)
+        .add(() => { live = true; });
     }
-  }
 
-  /* =====================================================================
-     MAGNETIC ACTIONS
-     ===================================================================== */
-  if (fine && !reduce) {
-    document.querySelectorAll(".btn--primary, .header__cta, [data-magnetic]").forEach(function (el) {
-      el.addEventListener("mousemove", function (e) {
-        var r = el.getBoundingClientRect();
-        el.style.transform = "translate(" + ((e.clientX - r.left - r.width / 2) * 0.25).toFixed(1) + "px," + ((e.clientY - r.top - r.height / 2) * 0.25).toFixed(1) + "px)";
-      });
-      el.addEventListener("mouseleave", function () { el.style.transform = ""; });
-    });
-  }
-
-  /* =====================================================================
-     FOOTER YEAR
-     ===================================================================== */
-  var yearEl = document.getElementById("year");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  /* =====================================================================
-     HEADER SCROLLED STATE
-     ===================================================================== */
-  var header = document.querySelector(".site-header");
-  function onScroll() {
-    var y = window.pageYOffset || document.documentElement.scrollTop;
-    if (header) header.classList.toggle("is-scrolled", y > 24);
-  }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
-
-  /* =====================================================================
-     MOBILE MENU
-     ===================================================================== */
-  var toggle = document.getElementById("menuToggle");
-  var mobileMenu = document.getElementById("mobileMenu");
-  function closeMenu() {
-    document.body.classList.remove("menu-open");
-    if (toggle) { toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", "Open menu"); }
-    if (mobileMenu) mobileMenu.setAttribute("aria-hidden", "true");
-  }
-  if (toggle && mobileMenu) {
-    toggle.addEventListener("click", function () {
-      var open = document.body.classList.toggle("menu-open");
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-      mobileMenu.setAttribute("aria-hidden", open ? "false" : "true");
-    });
-    mobileMenu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
-  }
-
-  /* =====================================================================
-     SMOOTH ANCHOR SCROLL
-     ===================================================================== */
-  document.querySelectorAll('a[href^="#"]').forEach(function (link) {
-    link.addEventListener("click", function (e) {
-      var id = link.getAttribute("href");
-      if (id === "#" || id.length < 2) return;
-      var target = document.querySelector(id);
-      if (!target) return;
-      e.preventDefault();
-      closeMenu();
-      var top = target.getBoundingClientRect().top + window.pageYOffset - 80;
-      window.scrollTo({ top: top, behavior: reduce ? "auto" : "smooth" });
-      if (history.replaceState) history.replaceState(null, "", id);
-    });
-  });
-
-  /* =====================================================================
-     ACTIVE SECTION IN NAV
-     ===================================================================== */
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav a"));
-  var sectionMap = {};
-  navLinks.forEach(function (link) {
-    var id = link.getAttribute("href").replace("#", "");
-    if (document.getElementById(id)) sectionMap[id] = link;
-  });
-  if ("IntersectionObserver" in window && Object.keys(sectionMap).length) {
-    var navIo = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          navLinks.forEach(function (l) { l.classList.remove("is-active"); });
-          if (sectionMap[entry.target.id]) sectionMap[entry.target.id].classList.add("is-active");
+    // letters swell toward the cursor, and breathe on touch screens
+    const hero = $('.hero');
+    let heroVisible = true;
+    new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; }).observe(hero);
+    let t0 = 0;
+    const loop = () => {
+      requestAnimationFrame(loop);
+      if (!live || !heroVisible) return;
+      t0 += 0.016;
+      const rects = fine ? els.map((el) => el.getBoundingClientRect()) : null;
+      letters.forEach((l, i) => {
+        let inf;
+        if (fine) {
+          if (!mouse.active) inf = 0;
+          else {
+            const r = rects[i];
+            const d = Math.hypot(mouse.x - (r.left + r.width / 2), mouse.y - (r.top + r.height / 2));
+            inf = Math.exp(-((d / 240) ** 2));
+          }
+        } else {
+          inf = (Math.sin(t0 * 1.3 - i * 0.55) * 0.5 + 0.5) * 0.55;
         }
+        const tw = 100 + 25 * inf, tg = 800 + 100 * inf;
+        l.wd = lerp(l.wd, tw, 0.12);
+        l.wg = lerp(l.wg, tg, 0.12);
+        apply(l);
       });
-    }, { rootMargin: "-45% 0px -50% 0px" });
-    Object.keys(sectionMap).forEach(function (id) { navIo.observe(document.getElementById(id)); });
+    };
+    if (!reduce) requestAnimationFrame(loop);
+
+    // scroll out: the signal flattens and the name pulls apart
+    ScrollTrigger.create({
+      trigger: hero, start: 'top top', end: 'bottom top', scrub: true,
+      onUpdate: (self) => { heroField.flat = self.progress; if (!heroField.running) heroField.draw(); },
+    });
+    if (!reduce) {
+      gsap.to('.hero__line:first-child', { xPercent: -14, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+      gsap.to('.hero__line--r', { xPercent: 14, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+      gsap.fromTo('.hero__foot, .hero__top', { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -40, ease: 'none', immediateRender: false, scrollTrigger: { trigger: hero, start: '30% top', end: '70% top', scrub: true } });
+    }
   }
 
-  /* =====================================================================
-     SVG DIAGRAM ENGINE - each project & the RAG flow drawn as a live system.
-     Labelled nodes, connectors, and event packets that flow and react to
-     hover. Logic preserved from the original build; only its CSS changed.
-     ===================================================================== */
-  var SPECS = {
-    sendmepls: {
-      h: 480,
-      aria: "SendMePls: customer and agent apps over WebSockets to a REST API, with Redis, a queue, and an AI pricing service.",
-      nodes: [
-        { id: "customer", label: "Customer",   x: 120, y: 120, kind: "client" },
-        { id: "agent",    label: "Agent",      x: 120, y: 360, kind: "client" },
-        { id: "ws",       label: "WebSocket",  x: 370, y: 240, kind: "rt" },
-        { id: "api",      label: "REST API",   x: 620, y: 240, kind: "hub" },
-        { id: "redis",    label: "Redis",      x: 880, y: 120, kind: "store" },
-        { id: "queue",    label: "Queue",      x: 880, y: 240, kind: "service" },
-        { id: "ai",       label: "AI Pricing", x: 880, y: 360, kind: "ai" }
-      ],
-      edges: [["customer","ws"],["agent","ws"],["ws","api"],["api","redis"],["api","queue"],["api","ai"]],
-      flows: [["customer","ws","api","redis"],["redis","api","ws","agent"],["api","queue"],["api","ai"]]
-    },
-    indikosh: {
-      h: 460,
-      aria: "Indikosh: a mobile app and admin panel on a REST API that calls TripJack, Yatra, Easebuzz, and MySQL.",
-      nodes: [
-        { id: "mobile",   label: "Mobile",   x: 120, y: 120, kind: "client" },
-        { id: "admin",    label: "Admin",    x: 120, y: 340, kind: "client" },
-        { id: "api",      label: "REST API", x: 380, y: 230, kind: "hub" },
-        { id: "tripjack", label: "TripJack", x: 640, y: 90,  kind: "service" },
-        { id: "yatra",    label: "Yatra",    x: 640, y: 230, kind: "service" },
-        { id: "easebuzz", label: "Easebuzz", x: 640, y: 370, kind: "pay" },
-        { id: "mysql",    label: "MySQL",    x: 880, y: 230, kind: "store" }
-      ],
-      edges: [["mobile","api"],["admin","api"],["api","tripjack"],["api","yatra"],["api","easebuzz"],["api","mysql"]],
-      flows: [["mobile","api","tripjack"],["mobile","api","yatra"],["api","easebuzz"],["api","mysql"]]
-    },
-    vendor: {
-      h: 470,
-      aria: "Vendor & Workforce: an app over MySQL with a queued export pipeline, plus a Text-to-SQL path through an LLM and Qdrant.",
-      nodes: [
-        { id: "user",   label: "User",      x: 120, y: 130, kind: "client" },
-        { id: "app",    label: "App / API", x: 390, y: 130, kind: "hub" },
-        { id: "mysql",  label: "MySQL",     x: 660, y: 130, kind: "store" },
-        { id: "queue",  label: "Exports",   x: 660, y: 340, kind: "service" },
-        { id: "llm",    label: "LLM",       x: 130, y: 340, kind: "ai" },
-        { id: "qdrant", label: "Qdrant",    x: 390, y: 340, kind: "store" }
-      ],
-      edges: [["user","app"],["app","mysql"],["app","queue"],["queue","mysql"],["user","llm"],["llm","qdrant"],["llm","app"]],
-      flows: [["user","llm","qdrant","llm","app","mysql"],["app","queue","mysql"]]
-    },
-    rfqai: {
-      h: 430,
-      aria: "RfqAI: a document chunked and read by an LLM, priced against Qdrant and market rates, producing a report.",
-      nodes: [
-        { id: "doc",     label: "Document",     x: 140, y: 150, kind: "client" },
-        { id: "chunker", label: "Chunker",      x: 360, y: 150, kind: "service" },
-        { id: "llm",     label: "LLM",          x: 560, y: 150, kind: "ai" },
-        { id: "qdrant",  label: "Qdrant",       x: 770, y: 90,  kind: "store" },
-        { id: "market",  label: "Market Rates", x: 770, y: 270, kind: "service" },
-        { id: "report",  label: "Report",       x: 910, y: 180, kind: "hub" }
-      ],
-      edges: [["doc","chunker"],["chunker","llm"],["llm","qdrant"],["llm","market"],["qdrant","report"],["market","report"]],
-      flows: [["doc","chunker","llm","qdrant","report"],["llm","market","report"]]
-    },
-    myrentalspot: {
-      h: 500,
-      aria: "MyRentalSpot: renters and landlords on an app that routes payments through Stripe Connect to multiple banks.",
-      nodes: [
-        { id: "renter",   label: "Renter",         x: 130, y: 120, kind: "client" },
-        { id: "landlord", label: "Landlord",       x: 130, y: 380, kind: "client" },
-        { id: "api",      label: "App / API",      x: 380, y: 250, kind: "hub" },
-        { id: "stripe",   label: "Stripe Connect", x: 640, y: 250, kind: "pay" },
-        { id: "banka",    label: "Bank A",         x: 890, y: 130, kind: "store" },
-        { id: "bankb",    label: "Bank B",         x: 890, y: 250, kind: "store" },
-        { id: "mysql",    label: "MySQL",          x: 640, y: 440, kind: "store" }
-      ],
-      edges: [["renter","api"],["landlord","api"],["api","stripe"],["stripe","banka"],["stripe","bankb"],["api","mysql"]],
-      flows: [["renter","api","stripe","banka"],["landlord","api","stripe","bankb"],["api","mysql"]]
-    },
-    jodlaw: {
-      h: 440,
-      aria: "Jod Law Firm: a Laravel CMS serving visitors and an admin, capturing leads into MySQL and running on AWS.",
-      nodes: [
-        { id: "visitor", label: "Visitor",     x: 130, y: 130, kind: "client" },
-        { id: "cms",     label: "Laravel CMS", x: 400, y: 130, kind: "hub" },
-        { id: "mysql",   label: "MySQL",       x: 680, y: 130, kind: "store" },
-        { id: "admin",   label: "Admin",       x: 130, y: 340, kind: "client" },
-        { id: "leads",   label: "Leads",       x: 400, y: 340, kind: "service" },
-        { id: "aws",     label: "AWS / CDN",   x: 680, y: 340, kind: "service" }
-      ],
-      edges: [["visitor","cms"],["cms","mysql"],["admin","cms"],["cms","leads"],["leads","mysql"],["cms","aws"]],
-      flows: [["visitor","cms","leads","mysql"],["admin","cms","mysql"],["cms","aws"]]
-    },
-    rag: {
-      h: 470,
-      aria: "A retrieval-augmented generation flow: a question is embedded, matched in Qdrant against indexed documents, and answered by an LLM.",
-      nodes: [
-        { id: "query",  label: "Question",  x: 110, y: 240, kind: "client" },
-        { id: "embed",  label: "Embed",     x: 330, y: 240, kind: "service" },
-        { id: "qdrant", label: "Qdrant",    x: 560, y: 115, kind: "store" },
-        { id: "docs",   label: "Documents", x: 560, y: 365, kind: "store" },
-        { id: "llm",    label: "LLM",       x: 770, y: 240, kind: "ai" },
-        { id: "answer", label: "Answer",    x: 925, y: 240, kind: "hub" }
-      ],
-      edges: [["query","embed"],["embed","qdrant"],["docs","qdrant"],["qdrant","llm"],["llm","answer"]],
-      flows: [["query","embed","qdrant","llm","answer"],["docs","qdrant","llm"]]
+  /* ----------------------------------------------------------- statement */
+  function initStatement() {
+    const text = $('.statement__text');
+    const items = [];
+    [...text.childNodes].forEach((node) => {
+      if (node.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+          const w = document.createElement('span');
+          w.className = 'w';
+          w.textContent = part;
+          frag.appendChild(w);
+          items.push(w);
+        });
+        node.replaceWith(frag);
+      } else if (node.classList && node.classList.contains('glyph')) {
+        items.push(node);
+      }
+    });
+    const caret = document.createElement('span');
+    caret.className = 'statement__caret';
+    text.prepend(caret);
+
+    const pin = $('.statement__pin');
+    const label = $('.statement__label');
+    const fitText = () => {
+      text.style.fontSize = '';
+      const cs = getComputedStyle(pin);
+      const avail = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - label.offsetHeight - parseFloat(cs.rowGap || 0) - 8;
+      let fs = parseFloat(getComputedStyle(text).fontSize);
+      while (text.offsetHeight > avail && fs > 14) {
+        fs *= 0.94;
+        text.style.fontSize = fs + 'px';
+      }
+    };
+    fitText();
+    ScrollTrigger.addEventListener('refreshInit', fitText);
+
+    let current = -1;
+    const place = (idx, instant) => {
+      if (idx === current) return;
+      current = idx;
+      items.forEach((el, i) => { el.classList.toggle('is-read', i < idx); el.classList.toggle('is-now', i === idx); });
+      const el = items[idx];
+      if (!el) { gsap.to(caret, { opacity: 0, duration: 0.3 }); return; }
+      const pad = parseFloat(getComputedStyle(text).fontSize) * 0.06;
+      gsap.to(caret, {
+        x: el.offsetLeft - pad, y: el.offsetTop + el.offsetHeight * 0.02, width: el.offsetWidth + pad * 2, height: el.offsetHeight * 0.98,
+        opacity: 1, duration: instant ? 0 : 0.28, ease: 'power3.out', overwrite: true,
+      });
+    };
+
+    ScrollTrigger.create({
+      trigger: '.statement', start: 'top top', end: '+=170%', pin: true, pinSpacing: true,
+      onUpdate: (self) => place(Math.min(items.length, Math.floor(self.progress * (items.length + 1)))),
+      onRefresh: (self) => { current = -1; place(Math.min(items.length, Math.floor(self.progress * (items.length + 1))), true); },
+    });
+    gsap.from('.statement__label', { autoAlpha: 0, x: -20, duration: 0.8, scrollTrigger: { trigger: '.statement', start: 'top 70%' } });
+  }
+
+  /* --------------------------------------------------------- split-flap */
+  const FLAP_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-&';
+  class Flap {
+    constructor(parent) {
+      const el = document.createElement('span');
+      el.className = 'flap';
+      el.innerHTML = '<span class="flap__h flap__h--t"><span class="flap__c"></span></span><span class="flap__h flap__h--b"><span class="flap__c"></span></span><span class="flap__h flap__h--ft"><span class="flap__c"></span></span><span class="flap__h flap__h--fb"><span class="flap__c"></span></span>';
+      parent.appendChild(el);
+      this.halves = [...el.children];
+      [this.t, this.b, this.ft, this.fb] = this.halves.map((x) => x.firstChild);
+      this.cur = ' ';
+      this.tl = null;
     }
+    snap(ch) {
+      this.cur = ch;
+      this.t.textContent = this.b.textContent = this.ft.textContent = this.fb.textContent = ch;
+      gsap.set([this.halves[2], this.halves[3]], { visibility: 'hidden', rotationX: 0 });
+    }
+    to(target, delay, force) {
+      if (this.tl) { if (force) return; this.tl.kill(); this.tl = null; this.snap(this.cur); }
+      if (target === this.cur && !force) return;
+      if (reduce) { this.snap(target); return; }
+      const hops = (force ? 2 : 1) + ((Math.random() * 3) | 0);
+      const seq = [];
+      for (let i = 0; i < hops; i++) seq.push(FLAP_CHARS[(Math.random() * FLAP_CHARS.length) | 0]);
+      seq.push(target);
+      const tl = gsap.timeline({ delay, onComplete: () => { this.tl = null; } });
+      const [, , ftH, fbH] = this.halves;
+      seq.forEach((next) => {
+        tl.call(() => {
+          const from = this.cur;
+          this.t.textContent = next; this.b.textContent = from;
+          this.ft.textContent = from; this.fb.textContent = next;
+          gsap.set(ftH, { visibility: 'visible', rotationX: 0 });
+          gsap.set(fbH, { visibility: 'visible', rotationX: 90 });
+        });
+        tl.to(ftH, { rotationX: -90, duration: 0.06, ease: 'power1.in' });
+        tl.to(fbH, { rotationX: 0, duration: 0.07, ease: 'power1.out' });
+        tl.call(() => { this.b.textContent = next; this.cur = next; gsap.set([ftH, fbH], { visibility: 'hidden' }); });
+      });
+      this.tl = tl;
+    }
+  }
+
+  /* ------------------------------------------------------------ work index */
+  function initBoard() {
+    const GROUPS = [['no', 2], ['name', 16], ['kind', 11], ['status', 8]];
+    const rows = $$('.dep__rows a').map((a) => {
+      const flaps = {};
+      GROUPS.forEach(([key, n]) => {
+        const wrap = document.createElement('span');
+        wrap.className = `dep__g dep__g--${key}`;
+        wrap.setAttribute('aria-hidden', 'true');
+        wrap.style.gridTemplateColumns = `repeat(${n}, minmax(0, 1fr))`;
+        a.appendChild(wrap);
+        flaps[key] = [...Array(n)].map(() => new Flap(wrap));
+      });
+      if (a.dataset.status === 'LIVE') a.classList.add('is-live');
+      return { a, flaps };
+    });
+    const flipRow = (r, delay) => GROUPS.forEach(([key, n], gi) => {
+      const text = (r.a.dataset[key] || '').padEnd(n, ' ').slice(0, n);
+      r.flaps[key].forEach((f, k) => f.to(text[k], delay + gi * 0.07 + k * 0.022));
+    });
+    ScrollTrigger.create({ trigger: '.dep', start: 'top 82%', once: true, onEnter: () => rows.forEach((r, i) => flipRow(r, i * 0.11)) });
+    rows.forEach((r) => {
+      r.a.addEventListener('mouseenter', () => r.flaps.name.forEach((f, k) => { if (f.cur !== ' ') f.to(f.cur, k * 0.02, true); }));
+      r.a.addEventListener('click', (e) => {
+        const film = $(r.a.hash);
+        const st = film && ScrollTrigger.getAll().find((s) => s.trigger === film && s.pin);
+        if (!st) return;
+        e.preventDefault();
+        window.scrollTo({ top: st.start + 2, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    });
+    if (window.SplitText && !reduce) {
+      const split = SplitText.create('.work__title', { type: 'chars', mask: 'chars' });
+      gsap.from(split.chars, { yPercent: 110, duration: 1, ease: 'expo.out', stagger: 0.05, scrollTrigger: { trigger: '.work', start: 'top 70%' } });
+    }
+  }
+
+  /* ---------------------------------------------------------------- films */
+  // Every project is a pinned film: a title card, then a few beats, while a
+  // device on stage acts the product out. Scenes read the timeline's time.
+  const seg = (t, a, d) => clamp((t - a) / d, 0, 1);
+  const inOut = gsap.parseEase('power2.inOut');
+  const out2 = gsap.parseEase('power2.out');
+  const setText = (el, v) => { if (el.textContent !== v) el.textContent = v; };
+  const inr = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
+
+  const SCENES = {
+    fincard(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const CIRC = 414.7;
+      const frags = qa('.frag');
+      gsap.set(q('.checks'), { autoAlpha: 0 });
+      tl.fromTo(frags, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.4, stagger: 0.03, ease: 'back.out(1.6)' }, 0.45)
+        .to(frags, { left: '50%', top: '50%', xPercent: -50, yPercent: -50, scale: 0.2, autoAlpha: 0, duration: 0.5, stagger: 0.025, ease: 'power3.in' }, at(1) - 0.3)
+        .to(q('.phone'), { scale: 1.04, duration: 0.12, yoyo: true, repeat: 1, ease: 'power1.inOut' }, at(1) + 0.15)
+        .to(q('.scr--splash'), { autoAlpha: 0, scale: 1.08, duration: 0.25 }, at(1) + 0.2)
+        .fromTo(q('.scr--home'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25, immediateRender: false }, at(1) + 0.2)
+        .fromTo(q('.ring__val'), { strokeDashoffset: CIRC }, { strokeDashoffset: CIRC * 0.36, duration: 0.6, ease: 'power2.out' }, at(1) + 0.3)
+        .from(qa('.ringbox__label, .ringbox__line'), { autoAlpha: 0, y: 12, duration: 0.2, stagger: 0.05 }, at(1) + 0.7)
+        .to(q('.ringbox'), { scale: 0.9, duration: 0.35 }, at(2))
+        .to(q('.checks'), { autoAlpha: 1, duration: 0.01 }, at(2) + 0.05)
+        .from(qa('.chk'), { autoAlpha: 0, y: 28, rotationX: -40, duration: 0.3, stagger: 0.06, ease: 'power3.out' }, at(2) + 0.05)
+        .from(qa('.chk em'), { scale: 0.6, autoAlpha: 0, duration: 0.2, stagger: 0.08, ease: 'back.out(2)' }, at(2) + 0.45)
+        .to(q('.scr--home'), { xPercent: -24, autoAlpha: 0, duration: 0.3 }, at(3))
+        .fromTo(q('.scr--sim'), { xPercent: 34, autoAlpha: 0 }, { xPercent: 0, autoAlpha: 1, duration: 0.3, immediateRender: false }, at(3));
+
+      const score = q('.js-score'), sim = q('.js-sim'), delta = q('.js-delta'), label = q('.js-sim-label');
+      const lv1 = q('.js-lv1'), lv2 = q('.js-lv2');
+      const lf1 = q('.js-lf1'), lt1 = q('.js-lt1'), lf2 = q('.js-lf2'), lt2 = q('.js-lt2');
+      on((t) => {
+        setText(score, String(Math.round(64 * out2(seg(t, at(1) + 0.3, 0.6)))));
+        const k = inOut(seg(t, at(3) + 0.25, 0.55));
+        const s = Math.round(64 + 12 * k);
+        setText(sim, String(s));
+        setText(delta, '+' + (s - 64));
+        setText(label, s >= 75 ? 'Strong' : 'On track');
+        label.classList.toggle('is-strong', s >= 75);
+        const p1 = 20 + 52 * k, p2 = 70 - 52 * k;
+        lf1.style.width = p1 + '%'; lt1.style.left = p1 + '%';
+        lf2.style.width = p2 + '%'; lt2.style.left = p2 + '%';
+        setText(lv1, inr(Math.round((40000 + 80000 * k) / 500) * 500));
+        setText(lv2, inr(Math.round((31200 - 23200 * k) / 100) * 100));
+      });
+    },
+
+    sendme(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const routes = qa('.map__route'), riders = qa('.map__rider'), halos = qa('.map__halo');
+      const len = routes[0].getTotalLength();
+      gsap.set(routes, { strokeDasharray: len, strokeDashoffset: len });
+      tl.to(routes, { strokeDashoffset: 0, duration: 0.55 }, at(0) + 0.05);
+      const pks = qa('.relay__pk');
+      const fwd = pks.filter((p) => !p.classList.contains('relay__pk--b'));
+      const back = pks.filter((p) => p.classList.contains('relay__pk--b'));
+      tl.fromTo(fwd, { left: '0%' }, { left: '100%', duration: 0.22, repeat: 3, stagger: 0.1, ease: 'none' }, at(1))
+        .fromTo(back, { left: '100%' }, { left: '0%', duration: 0.22, repeat: 3, ease: 'none' }, at(1) + 0.05)
+        .fromTo(q('.ai-chip'), { autoAlpha: 0, y: 16, scale: 0.85 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.3, ease: 'back.out(2)' }, at(2) + 0.35);
+      const node = q('.relay__node');
+      const eta = q('.js-eta'), sc = q('.js-status-c'), sr = q('.js-status-r'), btn = q('.js-btn');
+      const steps = qa('.sm__steps li');
+      const ease = gsap.parseEase('power1.inOut');
+      on((t) => {
+        const p = ease(seg(t, at(1) + 0.1, 0.75)) * 0.6 + ease(seg(t, at(2) + 0.05, 0.4)) * 0.4;
+        const pt = routes[0].getPointAtLength(p * len);
+        [...riders, ...halos].forEach((c) => { c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); });
+        const live = t > at(1) - 0.05 && t < at(2) + 0.3;
+        pks.forEach((k) => { k.style.opacity = live ? 1 : 0; });
+        node.classList.toggle('is-live', live);
+        const done = t > at(2) + 0.45;
+        setText(eta, done ? '0' : String(Math.max(1, Math.round(12 - 11 * p))));
+        const phase = t < at(0) + 0.35 ? 0 : t < at(1) + 0.1 ? 1 : done ? 3 : 2;
+        setText(sc, ['Finding a rider', 'Rider assigned · Arjun', 'On the way', 'Delivered'][phase]);
+        setText(sr, ['New order · 1.2 km', 'Heading to pickup', 'Drop at Sardarpura', 'Delivered'][phase]);
+        setText(btn, ['Accept order', 'Picked up', 'Mark delivered', 'Done'][phase]);
+        [at(0) + 0.1, at(1) + 0.1, at(1) + 0.4, at(2) + 0.45].forEach((th, i) => steps[i].classList.toggle('is-done', t > th));
+      });
+    },
+
+    indikosh(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const tabs = qa('.ik__tabs span'), ink = q('.ik__ink'), qEl = q('.js-ik-q'), dEl = q('.js-ik-d');
+      const TABS = [
+        ['<b>JDH</b> → <b>DEL</b>', 'Fri, 14 Nov · 1 adult · Economy'],
+        ['<b>New Delhi</b>', '14 to 16 Nov · 2 nights · 1 room'],
+        ['<b>JDH</b> → <b>JAI</b>', 'Fri, 14 Nov · Sleeper · 1 seat'],
+      ];
+      const rows = qa('.ik__res li');
+      tl.fromTo(rows, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.3, stagger: 0.1, ease: 'power3.out' }, at(1) + 0.05)
+        .from(qa('.ik__res .src'), { scale: 0.5, autoAlpha: 0, duration: 0.2, stagger: 0.1, ease: 'back.out(2)' }, at(1) + 0.25)
+        .fromTo(q('.ik__sheet'), { yPercent: 110 }, { yPercent: 0, duration: 0.25, ease: 'power3.out' }, at(2) + 0.02)
+        .to(q('.ik__sheet'), { yPercent: 110, duration: 0.2, ease: 'power2.in' }, at(2) + 0.38)
+        .fromTo(q('.ik__ticket'), { autoAlpha: 0, y: 40, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.25, ease: 'back.out(1.4)' }, at(2) + 0.6);
+      let tab = -1;
+      on((t) => {
+        const s = seg(t, at(0) + 0.05, 0.8);
+        const i = s < 0.25 ? 0 : s < 0.5 ? 1 : s < 0.75 ? 2 : 0;
+        if (i !== tab) {
+          tab = i;
+          tabs.forEach((x, k) => x.classList.toggle('is-on', k === i));
+          ink.style.transform = `translateX(${i * 100}%)`;
+          qEl.innerHTML = TABS[i][0];
+          dEl.textContent = TABS[i][1];
+        }
+        rows[0].classList.toggle('is-pick', t > at(2));
+      });
+    },
+
+    vendor(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const views = qa('.vw');
+      gsap.set(views.slice(1), { autoAlpha: 0 });
+      [1, 2].forEach((i) => {
+        tl.to(views[i - 1], { autoAlpha: 0, y: -20, duration: 0.25 }, at(i) - 0.05)
+          .fromTo(views[i], { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.3, immediateRender: false }, at(i) + 0.1);
+      });
+      const cellsWrap = q('.cells');
+      const cells = [...Array(48)].map(() => { const c = document.createElement('i'); cellsWrap.appendChild(c); return c; });
+      const trs = qa('.res tr').slice(1);
+      tl.from(q('.bubble'), { autoAlpha: 0, y: 16, scale: 0.95, duration: 0.25 }, at(2) + 0.05)
+        .fromTo(trs, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15, stagger: 0.08 }, at(2) + 0.62)
+        .fromTo(q('.scope'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, at(2) + 0.85);
+      const side = qa('.win__side span'), card = q('.tcard'), cols = qa('.flow__col'), role = q('.js-vrole');
+      const chunk = q('.js-chunk'), file = q('.file'), sql = q('.js-sql');
+      const ROLE = ['Submitted by vendor', 'Waiting on manager', 'Waiting on finance', 'Approved and ready to pay'];
+      const SQL = "SELECT v.name, b.amount, SUM(t.billed) AS billed\nFROM vendors v\nJOIN budgets b ON b.vendor_id = v.id\nJOIN timesheets t ON t.vendor_id = v.id\nWHERE t.month = '2026-08'\n  AND v.id IN (:allowed_vendor_ids)\nGROUP BY v.id HAVING billed > b.amount;";
+      let lastK = -1;
+      on((t) => {
+        const beat = t < at(1) ? 0 : t < at(2) ? 1 : 2;
+        side.forEach((x, i) => x.classList.toggle('is-on', i === [2, 3, 4][beat]));
+        const f = seg(t, at(0) + 0.1, 0.75) * 3;
+        const whole = Math.min(2, Math.floor(f));
+        const pos = f >= 3 ? 3 : whole + inOut(f - whole);
+        card.style.setProperty('--i', pos.toFixed(3));
+        const col = Math.round(pos);
+        cols.forEach((c, i) => c.classList.toggle('is-on', i === col));
+        setText(role, ROLE[col]);
+        const k = Math.floor(seg(t, at(1) + 0.1, 0.6) * 12);
+        if (k !== lastK) {
+          lastK = k;
+          cells.forEach((c, i) => c.classList.toggle('is-on', i < k * 4));
+          chunk.textContent = `Chunk ${k} / 12`;
+          file.classList.toggle('is-on', k === 12);
+        }
+        setText(sql, SQL.slice(0, Math.round(seg(t, at(2) + 0.15, 0.45) * SQL.length)));
+      });
+    },
+
+    rfq(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const doc = q('.doc'), scan = q('.doc__scan'), items = qa('.doc__lines .is-item');
+      const out = q('.rfq__out');
+      gsap.set(doc, { rotation: -4 });
+      tl.fromTo(doc, { xPercent: 50 }, { xPercent: 0, duration: 0.4 }, at(1) - 0.15)
+        .fromTo(out, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power3.out' }, at(1) - 0.05)
+        .fromTo(qa('.est tbody tr'), { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.25, stagger: 0.08, ease: 'power3.out' }, at(1) + 0.15)
+        .fromTo(qa('.est .src'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.2, stagger: 0.09, ease: 'back.out(2)' }, at(2) + 0.2)
+        .fromTo(q('.report'), { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: 0.25 }, at(2) + 0.75);
+      const rates = qa('.js-rate'), total = q('.js-total');
+      let marks = null;
+      on((t) => {
+        const s = seg(t, at(0) + 0.05, 0.75);
+        scan.style.top = (s * 100).toFixed(2) + '%';
+        scan.style.opacity = s > 0 && s < 1 ? 1 : 0;
+        if (!marks) marks = items.map((it) => (it.offsetTop + it.parentElement.offsetTop) / doc.offsetHeight);
+        items.forEach((it, i) => it.style.setProperty('--hl', clamp((s - marks[i]) / 0.08, 0, 1).toFixed(3)));
+        let sum = 0;
+        rates.forEach((el, i) => {
+          const f = seg(t, at(2) + 0.05 + i * 0.09, 0.25);
+          setText(el, f === 0 ? '…' : inr(+el.dataset.v * f));
+          sum += +el.dataset.v * +el.dataset.q * f;
+        });
+        setText(total, inr(sum));
+      });
+    },
+
+    rental(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const views = qa('.mr__v');
+      gsap.set(views.slice(1), { autoAlpha: 0 });
+      [1, 2].forEach((i) => {
+        tl.to(views[i - 1], { autoAlpha: 0, y: -20, duration: 0.25 }, at(i) - 0.05)
+          .fromTo(views[i], { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.3, immediateRender: false }, at(i) + 0.1);
+      });
+      const sig = q('.sig');
+      const L = sig.getTotalLength();
+      gsap.set(sig, { strokeDasharray: L, strokeDashoffset: L });
+      tl.from(q('.mr__app'), { autoAlpha: 0, x: -30, duration: 0.3 }, at(0) + 0.05)
+        .from(q('.lease'), { autoAlpha: 0, y: 40, duration: 0.35 }, at(0) + 0.15)
+        .to(sig, { strokeDashoffset: 0, duration: 0.45, ease: 'power1.inOut' }, at(0) + 0.35)
+        .fromTo(q('.stamp'), { autoAlpha: 0, scale: 1.8, rotation: -8 }, { autoAlpha: 1, scale: 1, rotation: -8, duration: 0.15, ease: 'power2.in' }, at(0) + 0.82);
+      const paths = qa('.route__p');
+      const lens = paths.map((p) => p.getTotalLength());
+      paths.forEach((p, i) => gsap.set(p, { strokeDasharray: lens[i], strokeDashoffset: lens[i] }));
+      tl.to(paths[0], { strokeDashoffset: 0, duration: 0.2 }, at(1) + 0.15)
+        .to(paths.slice(1), { strokeDashoffset: 0, duration: 0.25, stagger: 0.05 }, at(1) + 0.3)
+        .fromTo(qa('.js-amt'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, stagger: 0.08 }, at(1) + 0.5)
+        .fromTo(qa('.months li'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.25, stagger: 0.06 }, at(2) + 0.15)
+        .fromTo(qa('.months em'), { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.15, stagger: 0.08, ease: 'back.out(2)' }, at(2) + 0.4);
+      const dots = qa('.route__dot'), toggle = q('.toggle');
+      on((t) => {
+        const s = t - (at(1) + 0.45);
+        const live = s > 0 && t < at(2) + 0.1;
+        dots.forEach((d, k) => {
+          d.style.opacity = live ? 1 : 0;
+          if (!live) return;
+          const u = (s * 1.4 + k * 0.25) % 1;
+          const di = (k % 3) + 1;
+          const pt = u < 0.4 ? paths[0].getPointAtLength((u / 0.4) * lens[0]) : paths[di].getPointAtLength(((u - 0.4) / 0.6) * lens[di]);
+          d.setAttribute('cx', pt.x); d.setAttribute('cy', pt.y);
+        });
+        toggle.classList.toggle('is-on', t > at(2) + 0.1);
+      });
+    },
+
+    jod(root, tl, at, on) {
+      const q = (s) => $(s, root), qa = (s) => $$(s, root);
+      const pieces = [q('.site__nav'), q('.site__hero'), ...qa('.site__cards > div')];
+      const toast = q('.toast'), cms = q('.cms'), term = q('.term');
+      tl.fromTo(pieces, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.3, stagger: 0.07, ease: 'power3.out' }, at(0))
+        .fromTo(toast, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.2, ease: 'back.out(2)' }, at(0) + 0.6)
+        .to(toast, { autoAlpha: 0, duration: 0.15 }, at(1) - 0.1)
+        .fromTo(cms, { xPercent: 105 }, { xPercent: 0, duration: 0.3, ease: 'power3.out' }, at(1))
+        .to(cms, { xPercent: 105, duration: 0.25 }, at(2) - 0.05)
+        .fromTo(term, { autoAlpha: 0, y: 60 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'power3.out' }, at(2));
+      const cmsEl = q('.js-cms'), hero = q('.js-hero-t'), termEl = q('.js-term');
+      const S1 = 'Protect the name you built.', S2 = 'Your brand, registered right.';
+      const TERM = [
+        '$ deploy jodlawfirm.com',
+        '  server   aws ec2          ready',
+        '  app      laravel          migrated',
+        '  tls      certbot          valid',
+        '  cdn      static assets    cached',
+        '  https://jodlawfirm.com    200 OK',
+      ];
+      on((t) => {
+        const u = seg(t, at(1) + 0.3, 0.5);
+        let s = S1;
+        if (u > 0) s = u < 0.4 ? S1.slice(0, Math.round(S1.length * (1 - u / 0.4))) : S2.slice(0, Math.round(S2.length * ((u - 0.4) / 0.6)));
+        setText(cmsEl, s);
+        setText(hero, s || ' ');
+        setText(termEl, TERM.slice(0, Math.ceil(seg(t, at(2) + 0.2, 0.6) * TERM.length)).join('\n'));
+      });
+    },
   };
 
-  function buildDiagram(mount, spec) {
-    var vbW = 1000, vbH = spec.h || 520;
-    var svg = svgEl("svg", { viewBox: "0 0 " + vbW + " " + vbH, class: "dgm", preserveAspectRatio: "xMidYMid meet", role: "img" });
-    svg.setAttribute("aria-label", spec.aria || "System architecture diagram");
-    var gEdges = svgEl("g"), gPk = svgEl("g"), gNodes = svgEl("g");
+  function initFilms() {
+    const T0 = 0.8;
+    const at = (i) => T0 + i;
+    $$('.film').forEach((film) => {
+      const beats = $$('.beat', film);
+      const n = beats.length;
+      const title = $('.film__title', film);
+      const name = $('.film__name', film);
+      const stage = $('.film__stage', film);
+      const foot = $('.film__foot', film);
+      const stepsWrap = $('.film__steps', film);
+      const steps = beats.map(() => { const i = document.createElement('i'); stepsWrap.appendChild(i); return i; });
 
-    var map = {};
-    spec.nodes.forEach(function (n) { map[n.id] = n; });
-
-    /* node box half-extents (must match the rect drawn below) */
-    function boxHalf(n) { return { hw: Math.max(n.label.length * 16 + 46, 130) / 2, hh: 31 }; }
-    /* point where the centre-to-centre line exits `from`'s box border toward `to` */
-    function edgePoint(from, to) {
-      var ex = boxHalf(from), dx = to.x - from.x, dy = to.y - from.y;
-      var tx = dx !== 0 ? ex.hw / Math.abs(dx) : Infinity;
-      var ty = dy !== 0 ? ex.hh / Math.abs(dy) : Infinity;
-      var t = Math.min(tx, ty);
-      return { x: from.x + dx * t, y: from.y + dy * t };
-    }
-
-    var edgeEls = {};
-    spec.edges.forEach(function (e) {
-      var a = map[e[0]], b = map[e[1]];
-      var p1 = edgePoint(a, b), p2 = edgePoint(b, a);
-      var line = svgEl("line", { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, class: "dgm__edge" });
-      gEdges.appendChild(line);
-      edgeEls[e[0] + ">" + e[1]] = line; edgeEls[e[1] + ">" + e[0]] = line;
-    });
-
-    spec.nodes.forEach(function (n) {
-      var g = svgEl("g", { class: "dgm__node" + (n.kind ? " is-" + n.kind : "") });
-      var w = Math.max(n.label.length * 16 + 46, 130), h = 62;
-      g.appendChild(svgEl("rect", { x: n.x - w / 2, y: n.y - h / 2, width: w, height: h, rx: 11, class: "dgm__box" }));
-      var t = svgEl("text", { x: n.x, y: n.y, "text-anchor": "middle", "dominant-baseline": "central", class: "dgm__label" });
-      t.textContent = n.label;
-      g.appendChild(t);
-      gNodes.appendChild(g);
-      n._g = g;
-    });
-
-    svg.appendChild(gEdges); svg.appendChild(gPk); svg.appendChild(gNodes);
-    mount.appendChild(svg);
-
-    var flows = (spec.flows || []).map(function (seq, i) {
-      var pts = seq.map(function (id) { return [map[id].x, map[id].y]; });
-      var segz = [], total = 0;
-      for (var k = 0; k < pts.length - 1; k++) {
-        var L = Math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]);
-        segz.push(L); total += L;
+      // title card: split, and shrink if a single word would overflow
+      let chars = [name];
+      let words = [name];
+      if (window.SplitText) {
+        const split = SplitText.create(name, { type: 'words,chars', wordsClass: 'fw' });
+        chars = split.chars; words = split.words;
       }
-      var glow = svgEl("circle", { r: 11, class: "dgm__pk-glow" });
-      var core = svgEl("circle", { r: 5, class: "dgm__pk" });
-      gPk.appendChild(glow); gPk.appendChild(core);
-      return { pts: pts, segs: segz, total: total, glow: glow, core: core, t: (i / Math.max(1, seq.length)) + Math.random() * 0.4, sp: spec.speed || 0.0023 };
-    });
+      const fit = () => {
+        name.style.fontSize = '';
+        const max = title.clientWidth * 0.92;
+        const widest = Math.max(...words.map((w) => w.offsetWidth));
+        if (widest > max) name.style.fontSize = parseFloat(getComputedStyle(name).fontSize) * (max / widest) + 'px';
+      };
+      fit();
+      ScrollTrigger.addEventListener('refreshInit', fit);
 
-    function place(f) {
-      var d = f.t * f.total, i = 0;
-      while (i < f.segs.length && d > f.segs[i]) { d -= f.segs[i]; i++; }
-      if (i >= f.segs.length) { i = f.segs.length - 1; d = f.segs[i]; }
-      var a = f.pts[i], b = f.pts[i + 1] || a;
-      var r = f.segs[i] ? d / f.segs[i] : 0;
-      var x = a[0] + (b[0] - a[0]) * r, y = a[1] + (b[1] - a[1]) * r;
-      f.core.setAttribute("cx", x); f.core.setAttribute("cy", y);
-      f.glow.setAttribute("cx", x); f.glow.setAttribute("cy", y);
-    }
-    flows.forEach(place);
-
-    spec.nodes.forEach(function (n) {
-      n._g.addEventListener("mouseenter", function () {
-        spec.edges.forEach(function (e) {
-          if (e[0] === n.id || e[1] === n.id) { var ln = edgeEls[e[0] + ">" + e[1]]; if (ln) ln.classList.add("is-active"); }
+      const updaters = [];
+      const on = (fn) => updaters.push(fn);
+      const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
+      tl.to($$('.label, .film__sub', title), { autoAlpha: 0, y: -24, duration: 0.3 }, 0.05)
+        .to(chars, { yPercent: -110, autoAlpha: 0, duration: 0.35, stagger: { amount: 0.22 }, ease: 'power2.in' }, 0.05)
+        .fromTo(stage, { autoAlpha: 0, y: 90, scale: 0.94 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: 'power3.out' }, 0.35)
+        .fromTo(beats[0], { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power3.out' }, 0.55)
+        .fromTo(foot, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.3 }, 0.65);
+      for (let i = 1; i < n; i++) {
+        tl.to(beats[i - 1], { autoAlpha: 0, y: -36, duration: 0.25, ease: 'power2.in' }, at(i) - 0.2)
+          .fromTo(beats[i], { autoAlpha: 0, y: 44 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power3.out' }, at(i) + 0.05);
+      }
+      // every device is scaled to fit the space its stage actually has
+      const devices = $$('[data-tilt]', stage).map((device) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'film__fit';
+        device.parentNode.insertBefore(wrap, device);
+        wrap.appendChild(device);
+        return { wrap, device };
+      });
+      const fitStage = () => {
+        const w = stage.clientWidth, h = stage.clientHeight;
+        devices.forEach(({ wrap, device }) => {
+          const k = Math.min(1, w / device.offsetWidth, h / device.offsetHeight);
+          wrap.style.scale = k.toFixed(4);
         });
-        n._g.classList.add("is-hot");
-      });
-      n._g.addEventListener("mouseleave", function () {
-        gEdges.querySelectorAll(".dgm__edge").forEach(function (l) { l.classList.remove("is-active"); });
-        n._g.classList.remove("is-hot");
-      });
-    });
+      };
+      fitStage();
+      ScrollTrigger.addEventListener('refresh', fitStage);
 
-    var speedMul = 1;
-    mount.addEventListener("mouseenter", function () { speedMul = 2.6; });
-    mount.addEventListener("mouseleave", function () { speedMul = 1; });
+      const scene = SCENES[film.dataset.film];
+      if (scene) scene(film, tl, at, on);
+      tl.to({}, { duration: 0.01 }, at(n) + 0.15);
 
-    return {
-      tick: function () { for (var i = 0; i < flows.length; i++) { var f = flows[i]; f.t += f.sp * speedMul; if (f.t > 1) f.t -= 1; place(f); } },
-      static: function () { flows.forEach(function (f) { f.t = 0.5; place(f); }); }
-    };
-  }
+      const update = () => {
+        const t = tl.time();
+        updaters.forEach((f) => f(t));
+        const cur = t < T0 - 0.2 ? -1 : clamp(Math.floor(t - T0 + 0.2), 0, n - 1);
+        steps.forEach((s, k) => s.classList.toggle('is-on', k === cur));
+      };
+      tl.eventCallback('onUpdate', update);
+      update();
 
-  var diagrams = [];
-  document.querySelectorAll("[data-diagram]").forEach(function (mount) {
-    var spec = SPECS[mount.getAttribute("data-diagram")];
-    if (!spec) return;
-    var anim = buildDiagram(mount, spec);
-    var rec = { anim: anim, active: false };
-    diagrams.push(rec);
-    if (reduce) { anim.static(); return; }
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (es) { es.forEach(function (e) { rec.active = e.isIntersecting; }); }, { threshold: 0.05 }).observe(mount);
-    } else { rec.active = true; }
-  });
-  if (!reduce && diagrams.length) {
-    (function dloop() {
-      if (!document.hidden) { for (var i = 0; i < diagrams.length; i++) if (diagrams[i].active) diagrams[i].anim.tick(); }
-      requestAnimationFrame(dloop);
-    })();
-  }
-
-  /* =====================================================================
-     CAPABILITY GLYPHS - 7 line icons, drawn on as they enter view
-     ===================================================================== */
-  var ICONS = [
-    /* Backend */            '<rect x="6" y="7" width="20" height="6" rx="1.6"/><rect x="6" y="19" width="20" height="6" rx="1.6"/><circle cx="10" cy="10" r="1"/><circle cx="10" cy="22" r="1"/>',
-    /* Distributed */        '<circle cx="16" cy="16" r="3.1"/><circle cx="7" cy="8" r="2"/><circle cx="25" cy="9" r="2"/><circle cx="9" cy="25" r="2"/><circle cx="24" cy="24" r="2"/><path d="M13.3 14.1 8.6 9.7M18.7 14.3 23 10.7M13.6 18 10.2 23.1M18.6 18.2 22.3 22.3"/>',
-    /* AI & RAG */           '<path d="M10 23h11a5 5 0 0 0 .8-9.94 7 7 0 0 0-13.2-1.2A4.5 4.5 0 0 0 10 23z"/><path d="M16 14.5v5"/><path d="M13.5 16.5 16 14l2.5 2.5"/>',
-    /* Databases */          '<ellipse cx="16" cy="8" rx="9" ry="3"/><path d="M7 8v8c0 1.7 4 3 9 3s9-1.3 9-3V8"/><path d="M7 16v8c0 1.7 4 3 9 3s9-1.3 9-3v-8"/>',
-    /* Cloud Infra */        '<path d="M9.5 23h11a5 5 0 0 0 .4-9.98 7 7 0 0 0-13.2-1.1A4.6 4.6 0 0 0 9.5 23z"/>',
-    /* Payments */           '<rect x="5" y="9" width="22" height="14" rx="2"/><path d="M5 13.5h22"/><path d="M9 19h5"/>',
-    /* Performance */        '<path d="M17 4 8 18h6l-1 10 11-16h-7z"/>'
-  ];
-  document.querySelectorAll(".cap__icon").forEach(function (el, i) {
-    if (!ICONS[i]) return;
-    el.innerHTML = '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + ICONS[i] + "</svg>";
-  });
-
-  /* =====================================================================
-     SCROLL REVEALS (+ icon stroke-draw)
-     ===================================================================== */
-  if (hasGSAP && hasST && !reduce) {
-    gsap.utils.toArray("[data-reveal]").forEach(function (el) {
-      gsap.set(el, { opacity: 0, y: 18 });
-      var iconShapes = el.querySelectorAll(".cap__icon svg > *");
-      iconShapes.forEach(function (s) {
-        var len = 60; try { len = s.getTotalLength(); } catch (e) {}
-        if (!len || !isFinite(len)) len = 60;
-        s.style.strokeDasharray = len; s.style.strokeDashoffset = len;
-      });
       ScrollTrigger.create({
-        trigger: el, start: "top 88%", once: true,
-        onEnter: function () {
-          gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
-          iconShapes.forEach(function (s, k) {
-            gsap.to(s, { strokeDashoffset: 0, duration: 0.9, delay: 0.12 + k * 0.07, ease: "power2.out" });
+        animation: tl, trigger: film, start: 'top top',
+        end: () => '+=' + Math.round((n + 1) * 72) + '%',
+        pin: true, scrub: 0.8, invalidateOnRefresh: true,
+      });
+
+      // the device leans toward the cursor
+      if (fine && !reduce) {
+        $$('[data-tilt]', film).forEach((el) => {
+          gsap.set(el, { transformPerspective: 1400 });
+          const rx = gsap.quickTo(el, 'rotationX', { duration: 0.8, ease: 'power3' });
+          const ry = gsap.quickTo(el, 'rotationY', { duration: 0.8, ease: 'power3' });
+          film.addEventListener('mousemove', (e) => {
+            const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
+            rx(-ny * 8); ry(nx * 11);
           });
-        }
-      });
-    });
-    window.addEventListener("load", function () { ScrollTrigger.refresh(); });
-  } else if (hasGSAP) {
-    gsap.set("[data-reveal]", { opacity: 1, y: 0 });
-  }
-
-  /* =====================================================================
-     CARD TILT (desktop fine-pointer only)
-     ===================================================================== */
-  if (fine && !reduce) {
-    document.querySelectorAll("[data-tilt]").forEach(function (card) {
-      card.addEventListener("pointermove", function (e) {
-        var r = card.getBoundingClientRect();
-        var px = (e.clientX - r.left) / r.width - 0.5;
-        var py = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transform = "perspective(900px) rotateX(" + (-py * 4).toFixed(2) + "deg) rotateY(" + (px * 5).toFixed(2) + "deg)";
-      });
-      card.addEventListener("pointerleave", function () { card.style.transform = ""; });
-    });
-  }
-
-  /* =====================================================================
-     DEEP-DIVE TOGGLES (accessible, height-animated)
-     ===================================================================== */
-  document.querySelectorAll("[data-deepdive]").forEach(function (btn) {
-    var panel = btn.nextElementSibling;
-    if (!panel) return;
-    btn.addEventListener("click", function () {
-      var open = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", open ? "false" : "true");
-      if (open) {
-        if (hasGSAP && !reduce) {
-          gsap.to(panel, { height: 0, opacity: 0, duration: 0.3, ease: "power2.in", onComplete: function () { panel.hidden = true; panel.style.height = ""; panel.style.opacity = ""; } });
-        } else { panel.hidden = true; }
-      } else {
-        panel.hidden = false;
-        if (hasGSAP && !reduce) {
-          gsap.from(panel, { height: 0, opacity: 0, duration: 0.4, ease: "power2.out", onComplete: function () { panel.style.height = ""; } });
+        });
+        const frags = $('.frags', film);
+        if (frags) {
+          const fx = gsap.quickTo(frags, 'x', { duration: 1, ease: 'power3' });
+          const fy = gsap.quickTo(frags, 'y', { duration: 1, ease: 'power3' });
+          film.addEventListener('mousemove', (e) => { fx(-(e.clientX / innerWidth - 0.5) * 40); fy(-(e.clientY / innerHeight - 0.5) * 30); });
         }
       }
     });
-  });
+  }
 
-  /* =====================================================================
-     TECH STACK - category filter
-     ===================================================================== */
-  (function initStackFilter() {
-    var pills = document.querySelectorAll(".stack__pill");
-    if (!pills.length) return;
-    var tiles = document.querySelectorAll(".tech");
-    pills.forEach(function (p) {
-      p.addEventListener("click", function () {
-        pills.forEach(function (x) { x.classList.remove("is-on"); });
-        p.classList.add("is-on");
-        var f = p.getAttribute("data-filter");
-        tiles.forEach(function (t) {
-          var match = f === "all" || (" " + t.getAttribute("data-cat") + " ").indexOf(" " + f + " ") > -1;
-          t.classList.toggle("is-dim", !match);
-        });
-      });
+  /* ---------------------------------------------------------------- drum */
+  function initSkills() {
+    const skills = $$('.skill');
+    const n = skills.length;
+    const ring = $('.drum__ring');
+    const faces = skills.map((s) => {
+      const f = document.createElement('div');
+      f.className = 'drum__face';
+      f.textContent = s.dataset.word;
+      ring.appendChild(f);
+      return f;
     });
-  })();
+    const step = 360 / n;
+    let R = 0;
+    const layout = () => {
+      const hgt = ring.offsetHeight;
+      R = (hgt / 2) / Math.tan(Math.PI / n);
+      faces.forEach((f, i) => { f.style.transform = `rotateX(${-i * step}deg) translateZ(${R}px)`; });
+      render();
+    };
+    const state = { v: 0 };
+    let active = 0;
+    const render = () => {
+      ring.style.transform = `translateZ(${-R}px) rotateX(${state.v * step}deg)`;
+      faces.forEach((f, i) => {
+        const rel = Math.abs(state.v - i);
+        const near = clamp(1 - rel, 0, 1);
+        f.style.visibility = rel >= 1.9 ? 'hidden' : 'visible';
+        f.style.opacity = clamp(1 - rel * 0.45, 0.08, 1).toFixed(3);
+        f.style.fontVariationSettings = `"wdth" ${(70 + 55 * near).toFixed(1)}, "wght" ${(300 + 600 * near).toFixed(0)}`;
+      });
+      const a = clamp(Math.round(state.v), 0, n - 1);
+      if (a !== active) {
+        const prev = skills[active];
+        active = a;
+        const next = skills[a];
+        gsap.to(prev.children, { autoAlpha: 0, y: -14, duration: 0.2, overwrite: true, onComplete: () => prev.classList.remove('is-on') });
+        next.classList.add('is-on');
+        gsap.fromTo(next.children, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, delay: 0.1, stagger: 0.05, ease: 'expo.out', overwrite: true });
+      }
+    };
+    fitPanel($('.skills__pin'));
+    gsap.to(state, {
+      v: n - 1, ease: 'none', onUpdate: render,
+      scrollTrigger: { trigger: '.skills', start: 'top top', end: () => '+=' + (n - 1) * 50 + '%', pin: true, scrub: 0.9, onRefresh: layout },
+    });
+    layout();
+    gsap.from('.drum', { autoAlpha: 0, rotationX: -30, y: 60, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: '.skills', start: 'top 70%' } });
+  }
+
+  /* --------------------------------------------------------------- ruler */
+  function initExperience() {
+    const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const BASE = 2019;
+    const now = new Date();
+    const nowIdx = (now.getFullYear() - BASE) * 12 + now.getMonth();
+    const idx = (s) => { if (s === 'now') return nowIdx; const [y, m] = s.split('-').map(Number); return (y - BASE) * 12 + (m - 1); };
+    const MIN = -5, MAX = nowIdx + 7;
+
+    // two lanes of cards: work and study
+    const cards = $('.exp__cards');
+    const roles = $$('.role');
+    const slots = {};
+    [['work', 'Work', 'Still studying. My first job starts in December 2022.'], ['study', 'Study', 'Not studying at this point, working full-time.']].forEach(([key, name, empty]) => {
+      const slot = document.createElement('div');
+      slot.className = 'exp__slot';
+      slot.innerHTML = `<p class="label">${name}</p><div class="exp__slot-body"><p class="exp__empty role">${empty}</p></div>`;
+      cards.appendChild(slot);
+      slots[key] = { body: slot.querySelector('.exp__slot-body'), empty: slot.querySelector('.exp__empty'), current: null };
+    });
+    const items = roles.map((r) => {
+      const track = r.dataset.track;
+      slots[track].body.appendChild(r);
+      return { el: r, track, s: idx(r.dataset.start), e: idx(r.dataset.end), short: r.dataset.short };
+    });
+
+    const track = $('.js-ruler');
+    let ppm = 30;
+    const bars = [];
+    const build = () => {
+      ppm = clamp(innerWidth / 26, 18, 52);
+      track.innerHTML = '';
+      bars.length = 0;
+      track.style.width = (MAX - MIN) * ppm + 'px';
+      for (let m = MIN; m < MAX; m++) {
+        const t = document.createElement('i');
+        const year = ((m % 12) + 12) % 12 === 0;
+        t.className = 'tick' + (year ? ' tick--year' : '');
+        t.style.left = (m - MIN) * ppm + 'px';
+        if (year) t.innerHTML = `<span class="tick__y">${BASE + Math.floor(m / 12)}</span>`;
+        track.appendChild(t);
+      }
+      items.forEach((it) => {
+        const b = document.createElement('span');
+        b.className = 'bar bar--' + it.track;
+        b.style.left = (it.s - MIN) * ppm + 'px';
+        b.style.width = (it.e - it.s + 1) * ppm - 3 + 'px';
+        b.innerHTML = `<span>${it.short}</span>`;
+        track.appendChild(b);
+        bars.push(b);
+        it.left = (it.s - MIN) * ppm;
+        it.width = (it.e - it.s + 1) * ppm - 3;
+      });
+      render(true);
+    };
+
+    const monthEl = $('.js-month'), yearEl = $('.js-year');
+    const state = { v: 0 };
+    let lastM = null;
+    const render = (force) => {
+      const W = track.parentElement.offsetWidth;
+      const x = W / 2 - (state.v - MIN + 0.5) * ppm;
+      gsap.set(track, { x });
+      // keep each bar's label inside the visible part of the ruler
+      items.forEach((it, i) => {
+        const lab = bars[i] && bars[i].firstChild;
+        if (!lab) return;
+        const room = it.width - lab.offsetWidth - 20;
+        lab.style.transform = `translateX(${clamp(-x - it.left, 0, Math.max(0, room))}px)`;
+      });
+      const m = Math.round(state.v);
+      if (m === lastM && !force) return;
+      lastM = m;
+      monthEl.textContent = MONTHS[((m % 12) + 12) % 12];
+      yearEl.textContent = BASE + Math.floor(m / 12);
+      ['work', 'study'].forEach((key) => {
+        const slot = slots[key];
+        const hit = items.find((it) => it.track === key && m >= it.s && m <= it.e);
+        const next = hit ? hit.el : slot.empty;
+        if (slot.current === next) return;
+        const prev = slot.current;
+        slot.current = next;
+        if (prev) gsap.to(prev, { autoAlpha: 0, y: -16, duration: 0.2, overwrite: true, onComplete: () => prev.classList.remove('is-on') });
+        next.classList.add('is-on');
+        gsap.fromTo(next, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.5, delay: prev ? 0.12 : 0, ease: 'expo.out', overwrite: true });
+      });
+      items.forEach((it, i) => bars[i] && bars[i].classList.toggle('is-on', m >= it.s && m <= it.e));
+    };
+
+    fitPanel($('.exp__pin'));
+    gsap.to(state, {
+      v: nowIdx, ease: 'none', onUpdate: () => render(),
+      scrollTrigger: { trigger: '.exp', start: 'top top', end: '+=380%', pin: true, scrub: 0.7, onRefresh: build },
+    });
+    build();
+  }
+
+  /* ------------------------------------------------------------- contact */
+  function initContact() {
+    new Field($('.contact__field'), { baseLines: 22, top: 0.3, bottom: 1.05, calm: true });
+    if (reduce) return;
+    gsap.from('.contact__title > span', {
+      yPercent: 60, autoAlpha: 0, rotationX: -50, transformOrigin: '50% 100%', duration: 1.1, ease: 'expo.out', stagger: 0.1,
+      scrollTrigger: { trigger: '.contact', start: 'top 65%' },
+    });
+    gsap.from('.contact__lede, .contact__mail, .contact__links li, .contact__inner > .label', {
+      y: 30, autoAlpha: 0, duration: 0.9, ease: 'expo.out', stagger: 0.07,
+      scrollTrigger: { trigger: '.contact__title', start: 'top 60%' },
+    });
+  }
+
+  /* -------------------------------------------------- section awareness */
+  function initSections() {
+    const sections = $$('main section[data-chapter]');
+    const box = (el) => (el.parentElement.classList.contains('pin-spacer') ? el.parentElement : el);
+    let ticking = false;
+    const check = () => {
+      ticking = false;
+      const mid = innerHeight * 0.5;
+      for (const s of sections) {
+        const r = box(s).getBoundingClientRect();
+        if (r.top <= mid && r.bottom > mid) {
+          setChapter(s.dataset.chapter);
+          setTheme(s.dataset.theme);
+          break;
+        }
+      }
+    };
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } }, { passive: true });
+    ScrollTrigger.addEventListener('refresh', check);
+    check();
+  }
+
+  /* ---------------------------------------------------------------- boot */
+  const boot = () => {
+    initCursor();
+    initHero();
+    initStatement();
+    initBoard();
+    initFilms();
+    initSkills();
+    initExperience();
+    initContact();
+    initSections();
+    ScrollTrigger.refresh();
+  };
+  const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1800))]) : Promise.resolve();
+  fontsReady.then(boot);
+  window.addEventListener('load', () => ScrollTrigger.refresh());
 })();
